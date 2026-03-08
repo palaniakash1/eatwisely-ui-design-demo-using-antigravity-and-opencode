@@ -1,0 +1,34 @@
+Create a new frontend project called "EatWisely Restaurant Listing" using Vite and React with ES Modules.
+
+Requirements:
+
+* Use React 18 with functional components and hooks.
+* Use Vite as the build tool and dev server.
+* Configure TailwindCSS for styling with PostCSS and Autoprefixer.
+* Use Flowbite and Flowbite React for UI components.
+* Use React Router DOM for routing.
+* Implement global state management using Redux Toolkit with React Redux.
+* Persist state using Redux Persist.
+* Integrate Firebase for authentication, storage, and backend services.
+* Add Google Maps using @react-google-maps/api for location features.
+* Use react-icons for iconography.
+* Implement image optimization using browser-image-compression.
+* Ensure linting using ESLint with React Hooks and React Refresh plugins.
+
+Project setup:
+
+* Enable strict linting rules.
+* Use modern folder structure (components, pages, redux, services, utils).
+* Configure environment variables via Vite.
+* Ensure production build works via Vite build.
+
+Scripts required:
+
+* dev → run development server
+* build → build production bundle
+* preview → preview build
+* lint → run ESLint
+
+Goal:
+
+Replicate the exact dependency versions and environment to ensure compatibility with the original EatWisely frontend.
