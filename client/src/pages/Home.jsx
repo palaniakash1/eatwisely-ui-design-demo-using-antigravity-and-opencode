@@ -1,19 +1,49 @@
 import { Link } from 'react-router-dom'
-import { Card } from 'flowbite-react'
+import { Card, Button } from 'flowbite-react'
+import { HiArrowRight, HiStar } from 'react-icons/hi'
+import restaurantsData from '../data/restaurants.json'
+import RestaurantCard from '../components/RestaurantCard'
 
 export default function Home() {
+  const featuredRestaurants = restaurantsData.slice(0, 3)
+
   return (
     <div className="min-h-screen bg-[#f1f8eb]">
       <section className="bg-[#8fa31e] text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">EatWisely</h1>
+          <h1 className="text-5xl font-bold mb-6">
+            <span className="text-red-500">Eat</span>
+            <span className="text-white">Wisely</span>
+          </h1>
           <p className="text-xl mb-8">Discover restaurants with complete ingredient transparency</p>
-          <Link
-            to="/sign-up"
-            className="bg-white text-[#8fa31e] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition"
-          >
-            Get Started
+          <div className="flex justify-center gap-4">
+            <Link
+              to="/restaurants"
+              className="bg-white text-[#8fa31e] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition"
+            >
+              Browse Restaurants
+            </Link>
+            <Link
+              to="/sign-up"
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-[#8fa31e] transition"
+            >
+              Get Started
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-16">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold">Featured Restaurants</h2>
+          <Link to="/restaurants" className="text-[#8fa31e] font-semibold flex items-center gap-1 hover:underline">
+            View All <HiArrowRight className="w-5 h-5" />
           </Link>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {featuredRestaurants.map((restaurant) => (
+            <RestaurantCard key={restaurant._id} restaurant={restaurant} />
+          ))}
         </div>
       </section>
 

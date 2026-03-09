@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux"
 import OAuth from "../components/OAuth"
 import { Alert } from "flowbite-react"
+import usersData from "../data/users.json"
 
 const EyeIcon = (props) => (
   <svg
@@ -77,22 +78,20 @@ export default function SignIn() {
     }
     try {
       dispatch(signInStart())
-      const res = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-      const data = await res.json()
-      if (data.success === false) {
-        dispatch(signInFailure(data.message))
+      
+      const storedUsers = localStorage.getItem('users')
+      const allUsers = storedUsers ? JSON.parse(storedUsers) : usersData
+      
+      const user = allUsers.find(u => u.email === formData.email && u.password === formData.password)
+      
+      if (!user) {
+        dispatch(signInFailure("Invalid email or password"))
         return
       }
-      if (res.ok) {
-        dispatch(signInSuccess(data))
-        navigate("/")
-      }
+
+      const { password, ...userWithoutPassword } = user
+      dispatch(signInSuccess(userWithoutPassword))
+      navigate("/")
     } catch (error) {
       dispatch(signInFailure(error.message))
     }

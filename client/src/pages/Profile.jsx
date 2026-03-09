@@ -81,9 +81,9 @@ export default function Profile() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <TextInput
           type="text"
-          id="username"
+          id="userName"
           placeholder="Username"
-          defaultValue={currentUser.username}
+          defaultValue={currentUser.userName}
           onChange={handleChange}
         />
         <TextInput

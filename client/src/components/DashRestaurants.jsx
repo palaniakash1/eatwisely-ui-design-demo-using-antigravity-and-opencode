@@ -2,6 +2,18 @@ import { useState } from 'react'
 import { Card, Table, Button, TextInput, Textarea, Label, FileInput, Badge } from 'flowbite-react'
 import { HiPlus, HiPencil, HiTrash, HiSearch, HiLocationMarker } from 'react-icons/hi'
 
+const formatAddress = (address) => {
+  if (!address) return ''
+  if (typeof address === 'string') return address
+  const parts = [
+    address.addressLine1,
+    address.areaLocality,
+    address.city,
+    address.postcode
+  ].filter(Boolean)
+  return parts.join(', ')
+}
+
 export default function DashRestaurants() {
   const [restaurants, setRestaurants] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -88,7 +100,7 @@ export default function DashRestaurants() {
               filteredRestaurants.map((restaurant) => (
                 <Table.Row key={restaurant._id}>
                   <Table.Cell className="font-medium">{restaurant.name}</Table.Cell>
-                  <Table.Cell>{restaurant.address}</Table.Cell>
+                  <Table.Cell>{formatAddress(restaurant.address)}</Table.Cell>
                   <Table.Cell>
                     <Badge color={restaurant.isVerified ? 'success' : 'warning'}>
                       {restaurant.isVerified ? 'Verified' : 'Pending'}
