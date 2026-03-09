@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "userName": "testuser",
+    "email": "test@example.com",
+    "password": "test123",
+    "profilePicture": "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80",
+    "role": "user",
+    "restaurantId": null,
+    "createdByAdminId": null,
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439012",
+    "userName": "admin",
+    "email": "admin@eatwisely.com",
+    "password": "admin123",
+    "profilePicture": "https://.com/premium-vectorimg.freepik/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80",
+    "role": "admin",
+    "restaurantId": null,
+    "createdByAdminId": null,
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
