@@ -1,85 +1,108 @@
-import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { Table, Badge, Button, TextInput, Label, Modal, Select } from 'flowbite-react'
-import { HiPencil, HiTrash, HiSearch, HiOutlineExclamationCircle } from 'react-icons/hi'
-import { DashboardLayout, DashboardHeader, DashboardContent } from '../components/DashboardLayout'
-import usersData from '../data/users.json'
-import restaurantsData from '../data/restaurants.json'
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import {
+  Table,
+  Badge,
+  Button,
+  TextInput,
+  Label,
+  Modal,
+  Select,
+} from "flowbite-react";
+import { FaTrash, FaSearch, FaExclamation } from "react-icons/fa";
+import { FaPencil } from "react-icons/fa6";
+
+import usersData from "../data/users.json";
+import restaurantsData from "../data/restaurants.json";
+import {
+  DashboardHeader,
+  DashboardContent,
+  DashboardLayout,
+} from "../components/DashboardLayout";
 
 export default function DashUsers() {
-  const { currentUser } = useSelector((state) => state.user)
-  const [users, setUsers] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null)
+  const { currentUser } = useSelector((state) => state.user);
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({
-    userName: '',
-    email: '',
-    password: '',
-    role: 'user',
-    isActive: true
-  })
-  const [roleFilter, setRoleFilter] = useState([])
-  const [statusFilter, setStatusFilter] = useState([])
+    userName: "",
+    email: "",
+    password: "",
+    role: "user",
+    isActive: true,
+  });
+  const [roleFilter, setRoleFilter] = useState([]);
+  const [statusFilter, setStatusFilter] = useState([]);
 
   useEffect(() => {
-    const storedUsers = localStorage.getItem('users')
+    const storedUsers = localStorage.getItem("users");
     if (storedUsers) {
-      setUsers(JSON.parse(storedUsers))
+      setUsers(JSON.parse(storedUsers));
     } else {
-      setUsers(usersData)
-      localStorage.setItem('users', JSON.stringify(usersData))
+      setUsers(usersData);
+      localStorage.setItem("users", JSON.stringify(usersData));
     }
-  }, [])
+  }, []);
 
   const roleOptions = [
-    { value: 'user', label: 'User' },
-    { value: 'storeManager', label: 'Store Manager' },
-    { value: 'admin', label: 'Admin' },
-    { value: 'superAdmin', label: 'Super Admin' },
-  ]
+    { value: "user", label: "User" },
+    { value: "storeManager", label: "Store Manager" },
+    { value: "admin", label: "Admin" },
+    { value: "superAdmin", label: "Super Admin" },
+  ];
 
   const statusOptions = [
-    { value: 'active', label: 'Active', selected: statusFilter.includes('active') },
-    { value: 'inactive', label: 'Inactive', selected: statusFilter.includes('inactive') },
-  ]
+    {
+      value: "active",
+      label: "Active",
+      selected: statusFilter.includes("active"),
+    },
+    {
+      value: "inactive",
+      label: "Inactive",
+      selected: statusFilter.includes("inactive"),
+    },
+  ];
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
       user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = roleFilter.length === 0 || roleFilter.includes(user.role)
-    const matchesStatus = statusFilter.length === 0 || 
-      (statusFilter.includes('active') && user.isActive) ||
-      (statusFilter.includes('inactive') && !user.isActive)
-    return matchesSearch && matchesRole && matchesStatus
-  })
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole =
+      roleFilter.length === 0 || roleFilter.includes(user.role);
+    const matchesStatus =
+      statusFilter.length === 0 ||
+      (statusFilter.includes("active") && user.isActive) ||
+      (statusFilter.includes("inactive") && !user.isActive);
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
-  const totalItems = filteredUsers.length
-  const totalPages = Math.ceil(totalItems / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage)
+  const totalItems = filteredUsers.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   const handleRoleFilterChange = (value) => {
-    setRoleFilter(prev => 
-      prev.includes(value) 
-        ? prev.filter(r => r !== value)
-        : [...prev, value]
-    )
-    setCurrentPage(1)
-  }
+    setRoleFilter((prev) =>
+      prev.includes(value) ? prev.filter((r) => r !== value) : [...prev, value],
+    );
+    setCurrentPage(1);
+  };
 
   const handleStatusFilterChange = (value) => {
-    setStatusFilter(prev => 
-      prev.includes(value) 
-        ? prev.filter(s => s !== value)
-        : [...prev, value]
-    )
-    setCurrentPage(1)
-  }
+    setStatusFilter((prev) =>
+      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value],
+    );
+    setCurrentPage(1);
+  };
 
   const handleAddUser = () => {
     const newUser = {
@@ -87,52 +110,68 @@ export default function DashUsers() {
       ...formData,
       userName: formData.userName.toLowerCase(),
       email: formData.email.toLowerCase(),
-      profilePicture: 'https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80',
+      profilePicture:
+        "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80",
       restaurantId: null,
       createdByAdminId: currentUser?._id,
-      createdAt: new Date().toISOString()
-    }
-    const updatedUsers = [...users, newUser]
-    setUsers(updatedUsers)
-    localStorage.setItem('users', JSON.stringify(updatedUsers))
-    setShowAddModal(false)
-    setFormData({ userName: '', email: '', password: '', role: 'user', isActive: true })
-  }
+      createdAt: new Date().toISOString(),
+    };
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    setShowAddModal(false);
+    setFormData({
+      userName: "",
+      email: "",
+      password: "",
+      role: "user",
+      isActive: true,
+    });
+  };
 
   const handleEditUser = () => {
-    const updatedUsers = users.map(u => 
-      u._id === selectedUser._id 
-        ? { ...u, ...formData, userName: formData.userName.toLowerCase(), email: formData.email.toLowerCase() }
-        : u
-    )
-    setUsers(updatedUsers)
-    localStorage.setItem('users', JSON.stringify(updatedUsers))
-    setShowEditModal(false)
-    setSelectedUser(null)
-  }
+    const updatedUsers = users.map((u) =>
+      u._id === selectedUser._id
+        ? {
+            ...u,
+            ...formData,
+            userName: formData.userName.toLowerCase(),
+            email: formData.email.toLowerCase(),
+          }
+        : u,
+    );
+    setUsers(updatedUsers);
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    setShowEditModal(false);
+    setSelectedUser(null);
+  };
 
   const handleDeleteUser = (userId) => {
-    const updatedUsers = users.filter(u => u._id !== userId)
-    setUsers(updatedUsers)
-    localStorage.setItem('users', JSON.stringify(updatedUsers))
-  }
+    const updatedUsers = users.filter((u) => u._id !== userId);
+    setUsers(updatedUsers);
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+  };
 
   const openEditModal = (user) => {
-    setSelectedUser(user)
+    setSelectedUser(user);
     setFormData({
       userName: user.userName,
       email: user.email,
-      password: '',
+      password: "",
       role: user.role,
-      isActive: user.isActive
-    })
-    setShowEditModal(true)
-  }
+      isActive: user.isActive,
+    });
+    setShowEditModal(true);
+  };
 
   const filterOptions = [
-    ...roleOptions.map(o => ({ value: o.value, label: o.label, selected: roleFilter.includes(o.value) })),
-    ...statusOptions
-  ]
+    ...roleOptions.map((o) => ({
+      value: o.value,
+      label: o.label,
+      selected: roleFilter.includes(o.value),
+    })),
+    ...statusOptions,
+  ];
 
   return (
     <DashboardLayout activeTab="users" pageTitle="Users">
@@ -143,19 +182,21 @@ export default function DashUsers() {
         onAddClick={() => setShowAddModal(true)}
         filterOptions={filterOptions}
         onFilterChange={(value) => {
-          if (roleOptions.some(o => o.value === value)) {
-            handleRoleFilterChange(value)
+          if (roleOptions.some((o) => o.value === value)) {
+            handleRoleFilterChange(value);
           } else {
-            handleStatusFilterChange(value)
+            handleStatusFilterChange(value);
           }
         }}
         totalItems={totalItems}
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         onPageChange={(page) => {
-          setCurrentPage(page)
-          if (page === 1 && document.querySelector('select')) {
-            setItemsPerPage(parseInt(document.querySelector('select').value) || 10)
+          setCurrentPage(page);
+          if (page === 1 && document.querySelector("select")) {
+            setItemsPerPage(
+              parseInt(document.querySelector("select").value) || 10,
+            );
           }
         }}
       />
@@ -173,7 +214,10 @@ export default function DashUsers() {
             <Table.Body className="divide-y">
               {paginatedUsers.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell colSpan={6} className="text-center py-8 text-gray-500">
+                  <Table.Cell
+                    colSpan={6}
+                    className="text-center py-8 text-gray-500"
+                  >
                     No users found
                   </Table.Cell>
                 </Table.Row>
@@ -183,24 +227,43 @@ export default function DashUsers() {
                     <Table.Cell className="whitespace-nowrap font-medium">
                       <div className="flex items-center gap-3">
                         {user.profilePicture ? (
-                          <img src={user.profilePicture} alt="" className="w-8 h-8 rounded-full" />
+                          <img
+                            src={user.profilePicture}
+                            alt=""
+                            className="w-8 h-8 rounded-full"
+                          />
                         ) : (
                           <div className="w-8 h-8 rounded-full bg-[#8fa31e] flex items-center justify-center text-white text-sm">
                             {user.userName?.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        {user.userName}
+                        <span className="hidden sm:inline">
+                          {user.userName}
+                        </span>
+                        <span className="sm:hidden">
+                          {user.userName?.slice(0, 10)}
+                        </span>
                       </div>
                     </Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell className="whitespace-nowrap">
+                      {user.email}
+                    </Table.Cell>
                     <Table.Cell>
-                      <Badge color={user.role === 'superAdmin' ? 'purple' : user.role === 'admin' ? 'blue' : 'gray'}>
+                      <Badge
+                        color={
+                          user.role === "superAdmin"
+                            ? "purple"
+                            : user.role === "admin"
+                              ? "blue"
+                              : "gray"
+                        }
+                      >
                         {user.role}
                       </Badge>
                     </Table.Cell>
                     <Table.Cell>
-                      <Badge color={user.isActive ? 'success' : 'failure'}>
-                        {user.isActive ? 'Active' : 'Inactive'}
+                      <Badge color={user.isActive ? "success" : "failure"}>
+                        {user.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </Table.Cell>
                     <Table.Cell className="whitespace-nowrap">
@@ -208,16 +271,20 @@ export default function DashUsers() {
                     </Table.Cell>
                     <Table.Cell>
                       <div className="flex items-center gap-2">
-                        <Button size="xs" color="blue" onClick={() => openEditModal(user)}>
-                          <HiPencil className="w-4 h-4" />
+                        <Button
+                          size="xs"
+                          color="blue"
+                          onClick={() => openEditModal(user)}
+                        >
+                          <FaPencil className="w-3 h-3" />
                         </Button>
-                        <Button 
-                          size="xs" 
-                          color="failure" 
+                        <Button
+                          size="xs"
+                          color="failure"
                           onClick={() => handleDeleteUser(user._id)}
                           disabled={user._id === currentUser?._id}
                         >
-                          <HiTrash className="w-4 h-4" />
+                          <FaTrash className="w-3 h-3" />
                         </Button>
                       </div>
                     </Table.Cell>
@@ -237,7 +304,9 @@ export default function DashUsers() {
                 <TextInput
                   id="userName"
                   value={formData.userName}
-                  onChange={(e) => setFormData({...formData, userName: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, userName: e.target.value })
+                  }
                   placeholder="Enter username"
                 />
               </div>
@@ -247,7 +316,9 @@ export default function DashUsers() {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="Enter email"
                 />
               </div>
@@ -257,7 +328,9 @@ export default function DashUsers() {
                   id="password"
                   type="password"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   placeholder="Enter password"
                 />
               </div>
@@ -266,10 +339,14 @@ export default function DashUsers() {
                 <Select
                   id="role"
                   value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
                 >
-                  {roleOptions.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  {roleOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
                 </Select>
               </div>
@@ -277,7 +354,9 @@ export default function DashUsers() {
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={handleAddUser}>Add User</Button>
-            <Button color="gray" onClick={() => setShowAddModal(false)}>Cancel</Button>
+            <Button color="gray" onClick={() => setShowAddModal(false)}>
+              Cancel
+            </Button>
           </Modal.Footer>
         </Modal>
 
@@ -290,7 +369,9 @@ export default function DashUsers() {
                 <TextInput
                   id="editUserName"
                   value={formData.userName}
-                  onChange={(e) => setFormData({...formData, userName: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, userName: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -299,16 +380,23 @@ export default function DashUsers() {
                   id="editEmail"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
               </div>
               <div>
-                <Label htmlFor="editPassword" value="Password (leave blank to keep current)" />
+                <Label
+                  htmlFor="editPassword"
+                  value="Password (leave blank to keep current)"
+                />
                 <TextInput
                   id="editPassword"
                   type="password"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   placeholder="New password"
                 />
               </div>
@@ -317,10 +405,14 @@ export default function DashUsers() {
                 <Select
                   id="editRole"
                   value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
                 >
-                  {roleOptions.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  {roleOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
                 </Select>
               </div>
@@ -328,10 +420,12 @@ export default function DashUsers() {
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={handleEditUser}>Save Changes</Button>
-            <Button color="gray" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button color="gray" onClick={() => setShowEditModal(false)}>
+              Cancel
+            </Button>
           </Modal.Footer>
         </Modal>
       </DashboardContent>
     </DashboardLayout>
-  )
+  );
 }

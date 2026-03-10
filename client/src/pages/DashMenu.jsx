@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Table, Badge, Button, TextInput, Label, Modal, Select } from 'flowbite-react'
-import { HiPencil, HiTrash, HiSearch } from 'react-icons/hi'
-import { DashboardLayout, DashboardHeader, DashboardContent } from '../components/DashboardLayout'
-import restaurantsData from '../data/restaurants.json'
+import { FaPencil } from "react-icons/fa6";
+import {
+  DashboardHeader,
+  DashboardContent,
+  DashboardLayout,
+} from "../components/DashboardLayout";
+import { FaTrash } from "react-icons/fa";
+import restaurantsData from "../data/restaurants.json";
 
 const defaultMenuItems = [
   { _id: '1', name: 'Butter Chicken', description: 'Creamy tomato curry', price: 15.99, category: 'Main Course', restaurantId: '1', isAvailable: true, createdAt: '2025-01-01' },
@@ -119,7 +124,7 @@ export default function DashMenu() {
   }
 
   return (
-    <DashboardLayout activeTab="menu" pageTitle="Menu">
+    <>
       <DashboardHeader
         title="Menu Items"
         searchValue={searchTerm}
@@ -133,53 +138,55 @@ export default function DashMenu() {
         onPageChange={setCurrentPage}
       />
       <DashboardContent>
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <Table hoverable>
-            <Table.Head className="bg-gray-50">
-              <Table.HeadCell>Item</Table.HeadCell>
-              <Table.HeadCell>Restaurant</Table.HeadCell>
-              <Table.HeadCell>Category</Table.HeadCell>
-              <Table.HeadCell>Price</Table.HeadCell>
-              <Table.HeadCell>Status</Table.HeadCell>
-              <Table.HeadCell>Actions</Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y">
-              {paginatedItems.length === 0 ? (
-                <Table.Row>
-                  <Table.Cell colSpan={6} className="text-center py-8 text-gray-500">
-                    No menu items found
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                paginatedItems.map((item) => (
-                  <Table.Row key={item._id} className="bg-white">
-                    <Table.Cell className="font-medium">
-                      <div>{item.name}</div>
-                      <div className="text-xs text-gray-500">{item.description}</div>
-                    </Table.Cell>
-                    <Table.Cell>{getRestaurantName(item.restaurantId)}</Table.Cell>
-                    <Table.Cell><Badge color="gray">{item.category}</Badge></Table.Cell>
-                    <Table.Cell className="font-medium">£{item.price.toFixed(2)}</Table.Cell>
-                    <Table.Cell>
-                      <Badge color={item.isAvailable ? 'success' : 'failure'}>
-                        {item.isAvailable ? 'Available' : 'Unavailable'}
-                      </Badge>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <div className="flex items-center gap-2">
-                        <Button size="xs" color="blue" onClick={() => openEditModal(item)}>
-                          <HiPencil className="w-4 h-4" />
-                        </Button>
-                        <Button size="xs" color="failure" onClick={() => handleDeleteMenuItem(item._id)}>
-                          <HiTrash className="w-4 h-4" />
-                        </Button>
-                      </div>
+        <div className="overflow-x-auto">
+          <div className="bg-white rounded-lg shadow min-w-full">
+            <Table hoverable>
+              <Table.Head className="bg-gray-50">
+                <Table.HeadCell>Item</Table.HeadCell>
+                <Table.HeadCell>Restaurant</Table.HeadCell>
+                <Table.HeadCell>Category</Table.HeadCell>
+                <Table.HeadCell>Price</Table.HeadCell>
+                <Table.HeadCell>Status</Table.HeadCell>
+                <Table.HeadCell>Actions</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {paginatedItems.length === 0 ? (
+                  <Table.Row>
+                    <Table.Cell colSpan={6} className="text-center py-8 text-gray-500">
+                      No menu items found
                     </Table.Cell>
                   </Table.Row>
-                ))
-              )}
-            </Table.Body>
-          </Table>
+                ) : (
+                  paginatedItems.map((item) => (
+                    <Table.Row key={item._id} className="bg-white">
+                      <Table.Cell className="font-medium">
+                        <div className="text-sm">{item.name}</div>
+                        <div className="text-xs text-gray-500">{item.description}</div>
+                      </Table.Cell>
+                      <Table.Cell className="text-sm">{getRestaurantName(item.restaurantId)}</Table.Cell>
+                      <Table.Cell><Badge color="gray">{item.category}</Badge></Table.Cell>
+                      <Table.Cell className="font-medium">£{item.price.toFixed(2)}</Table.Cell>
+                      <Table.Cell>
+                        <Badge color={item.isAvailable ? 'success' : 'failure'}>
+                          {item.isAvailable ? 'Available' : 'Unavailable'}
+                        </Badge>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <div className="flex items-center gap-2">
+                          <Button size="xs" color="blue" onClick={() => openEditModal(item)}>
+                            <FaPencil className="w-3 h-3" />
+                          </Button>
+                          <Button size="xs" color="failure" onClick={() => handleDeleteMenuItem(item._id)}>
+                            <FaTrash className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))
+                )}
+              </Table.Body>
+            </Table>
+          </div>
         </div>
 
         <Modal show={showAddModal} onClose={() => setShowAddModal(false)}>
@@ -255,6 +262,6 @@ export default function DashMenu() {
           </Modal.Footer>
         </Modal>
       </DashboardContent>
-    </DashboardLayout>
+    </>
   )
 }

@@ -9,7 +9,7 @@ import {
 } from "../redux/user/userSlice"
 import OAuth from "../components/OAuth"
 import { Alert } from "flowbite-react"
-import usersData from "../data/users.json"
+import { findUserByEmailInJson, createUserInJson } from "../services/userApi"
 
 const EyeIcon = (props) => (
   <svg
@@ -74,29 +74,13 @@ export default function SignUp() {
     try {
       dispatch(signInStart())
       
-      const existingUser = usersData.find(u => u.email === formData.email)
+      const existingUser = await findUserByEmailInJson(formData.email)
       if (existingUser) {
         dispatch(signInFailure("User already exists"))
         return
       }
 
-      const newUser = {
-        _id: Date.now().toString(),
-        userName: formData.username.toLowerCase(),
-        email: formData.email.toLowerCase(),
-        password: formData.password,
-        profilePicture: 'https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80',
-        role: 'user',
-        restaurantId: null,
-        createdByAdminId: null,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      }
-      
-      const updatedUsers = [...usersData, newUser]
-      localStorage.setItem('users', JSON.stringify(updatedUsers))
-      
-      const { password, ...userWithoutPassword } = newUser
+      const userWithoutPassword = await createUserInJson(formData)
       dispatch(signInSuccess(userWithoutPassword))
       navigate("/")
     } catch (error) {

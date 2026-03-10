@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { signOut } from '../redux/user/userSlice'
-import { FaUsers, FaUtensils, FaTags, FaList, FaCog, FaScroll, FaSignOutAlt } from 'react-icons/fa'
+import { FaUsers, FaUtensils, FaTags, FaList, FaCog, FaScroll, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa'
 
 const menuItems = [
   { id: 'users', label: 'Users', icon: FaUsers, path: '/dashboard/users' },
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   
   const getActiveTab = () => {
     const path = location.pathname
@@ -39,14 +41,35 @@ export default function Dashboard() {
     navigate('/sign-in')
   }
 
+  const closeSidebar = () => setSidebarOpen(false)
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside className="w-1/5 min-w-[260px] bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50 
+        w-64 bg-white border-r border-gray-200 flex flex-col
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <span className="text-2xl font-bold text-[#8fa31e]">EatWisely</span>
           </Link>
-          <p className="text-xs text-gray-500 mt-1">Admin Dashboard</p>
+          <button 
+            onClick={closeSidebar}
+            className="lg:hidden p-1"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -54,6 +77,7 @@ export default function Dashboard() {
             <Link
               key={item.id}
               to={item.path}
+              onClick={closeSidebar}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 activeTab === item.id
                   ? 'bg-[#8fa31e] text-white'
@@ -71,6 +95,7 @@ export default function Dashboard() {
             <Link
               key={item.id}
               to={item.path}
+              onClick={closeSidebar}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 activeTab === item.id
                   ? 'bg-[#8fa31e] text-white'
@@ -115,9 +140,25 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <Outlet />
-      </main>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile header */}
+        <div className="lg:hidden bg-white border-b border-gray-200 p-4 flex items-center">
+          <button 
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 mr-4"
+          >
+            <FaBars className="w-6 h-6" />
+          </button>
+          <Link to="/" className="flex items-center gap-2">
+            <span className="text-xl font-bold text-[#8fa31e]">EatWisely</span>
+          </Link>
+        </div>
+
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

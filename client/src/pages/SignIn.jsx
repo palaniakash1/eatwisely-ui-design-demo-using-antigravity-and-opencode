@@ -9,7 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux"
 import OAuth from "../components/OAuth"
 import { Alert } from "flowbite-react"
-import usersData from "../data/users.json"
+import { validateUserCredentials } from "../services/userApi"
 
 const EyeIcon = (props) => (
   <svg
@@ -79,10 +79,7 @@ export default function SignIn() {
     try {
       dispatch(signInStart())
       
-      const storedUsers = localStorage.getItem('users')
-      const allUsers = storedUsers ? JSON.parse(storedUsers) : usersData
-      
-      const user = allUsers.find(u => u.email === formData.email && u.password === formData.password)
+      const user = await validateUserCredentials(formData.email, formData.password)
       
       if (!user) {
         dispatch(signInFailure("Invalid email or password"))
