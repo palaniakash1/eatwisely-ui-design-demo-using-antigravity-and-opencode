@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { HiHome, HiUser, HiCollection, HiMenuAlt2, HiStar, HiCog, HiLogout } from 'react-icons/hi'
+import { useDispatch } from 'react-redux'
+import { HiHome, HiUser, HiCollection, HiMenuAlt2, HiStar, HiCog, HiLogout, HiUserCircle } from 'react-icons/hi'
+import { signOutSuccess } from '../redux/user/userSlice'
+import { logoutUser } from '../services/userApi'
 
 const navItems = [
   { name: 'Overview', path: '/dashboard', icon: HiHome },
@@ -8,9 +11,17 @@ const navItems = [
   { name: 'Menu', path: '/dashboard/menu', icon: HiMenuAlt2 },
   { name: 'Users', path: '/dashboard/users', icon: HiUser },
   { name: 'Reviews', path: '/dashboard/reviews', icon: HiStar },
+  { name: 'Profile', path: '/dashboard/profile', icon: HiUserCircle },
 ]
 
 export default function DashSidebar({ isOpen, onClose }) {
+  const dispatch = useDispatch()
+
+  const handleLogout = async () => {
+    await logoutUser()
+    dispatch(signOutSuccess())
+  }
+
   return (
     <>
       {isOpen && (
@@ -48,14 +59,10 @@ export default function DashSidebar({ isOpen, onClose }) {
         </nav>
 
         <div className="absolute bottom-0 w-full border-t">
-          <NavLink
-            to="/dashboard/profile"
-            className="flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-[#f1f8eb]"
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-[#f1f8eb] w-full"
           >
-            <HiCog className="w-5 h-5" />
-            <span>Settings</span>
-          </NavLink>
-          <button className="flex items-center gap-3 px-6 py-3 text-gray-600 hover:bg-[#f1f8eb] w-full">
             <HiLogout className="w-5 h-5" />
             <span>Logout</span>
           </button>

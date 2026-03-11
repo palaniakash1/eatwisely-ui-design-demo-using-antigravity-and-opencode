@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { signOut } from '../redux/user/userSlice'
+import { logoutUser } from '../services/userApi'
 import { Navbar, TextInput, Button, Dropdown, Avatar } from 'flowbite-react'
 import { HiSearch, HiLocationMarker, HiUser, HiCog, HiLogout, HiViewGrid } from 'react-icons/hi'
 
@@ -19,7 +20,7 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/signout')
+      await logoutUser()
       dispatch(signOut())
       navigate('/')
     } catch (error) {

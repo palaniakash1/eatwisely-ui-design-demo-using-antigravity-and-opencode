@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -7,9 +7,10 @@ import {
   signInFailure,
   clearError,
 } from "../redux/user/userSlice"
-import OAuth from "../components/OAuth"
-import { Alert } from "flowbite-react"
-import { findUserByEmailInJson, createUserInJson } from "../services/userApi"
+import { useToast } from "../components/Toast"
+import { createUserInJson } from "../services/userApi"
+import wavepattern from "../assets/wavepattern.png"
+import logo from "../assets/eatwisely.ico"
 
 const EyeIcon = (props) => (
   <svg
@@ -54,7 +55,15 @@ export default function SignUp() {
   const { loading, error } = useSelector((state) => state.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const toast = useToast()
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error)
+      dispatch(clearError())
+    }
+  }, [error, dispatch, toast])
 
   const handleChange = (e) => {
     if (error) dispatch(clearError())
@@ -67,21 +76,16 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!formData.username || !formData.email || !formData.password) {
+    if (!formData.userName || !formData.email || !formData.password) {
       dispatch(signInFailure("Please fill in all fields"))
       return
     }
     try {
       dispatch(signInStart())
       
-      const existingUser = await findUserByEmailInJson(formData.email)
-      if (existingUser) {
-        dispatch(signInFailure("User already exists"))
-        return
-      }
-
-      const userWithoutPassword = await createUserInJson(formData)
-      dispatch(signInSuccess(userWithoutPassword))
+      const { user } = await createUserInJson(formData)
+      dispatch(signInSuccess(user))
+      toast.success("Account created successfully!")
       navigate("/")
     } catch (error) {
       dispatch(signInFailure(error.message))
@@ -97,20 +101,52 @@ export default function SignUp() {
   return (
     <main className="min-h-screen flex">
       <div className="hidden lg:flex flex-col w-[45%] bg-[#8fa31e] relative overflow-hidden p-12 justify-center items-start">
-        <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none bg-[url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800')] bg-cover bg-center" />
-        <div className="relative z-10">
-          <h1 className="text-7xl font-black text-white leading-tight uppercase tracking-normal">
-            CLARITY IN <br /> EVERY <br /> INGREDIENT
-          </h1>
+          <img
+            src={wavepattern}
+            alt="pattern"
+            className="absolute top-0 left-0 w-full opacity-30 pointer-events-none object-cover"
+          />
+
+          <div className="relative z-10">
+            <h1 className="text-7xl font-black text-white leading-tight uppercase tracking-normal">
+              Your Menu <br /> Made <br /> Smarter
+            </h1>
+            <div className="mt-8 w-full">
+              <svg
+                viewBox="0 0 120 40"
+                fill="none"
+                className="w-full h-auto"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <path
+                  d="M10 10C30 35 90 35 110 10"
+                  stroke="#ff0000"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M5 12L15 8"
+                  stroke="#ff0000"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M115 12L105 8"
+                  stroke="#ff0000"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
-      </div>
 
       <div className="flex-1 bg-[#f1f8eb] flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-md bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
           <div className="py-8 text-center pb-0">
             <div className="flex items-center justify-center gap-1 mb-6">
               <Link to="/">
-                <h1 className="text-3xl font-bold text-[#8fa31e]">EatWisely</h1>
+                <img src={logo} width="200px" height="200px" alt="logo" />
               </Link>
             </div>
             <div className="bg-[#8fa31e] text-white py-3 rounded-[2px] shadow-md">
@@ -120,41 +156,41 @@ export default function SignUp() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
             <div className="space-y-1 mt-4">
-              <label className="text-md font-normal text-gray-500">Username</label>
+              <label className="text-md font-normal text-gray-500">Enter UserName</label>
               <input
                 type="text"
                 placeholder=""
-                id="username"
-                className="w-full border-gray-200 p-3 rounded-md bg-white focus:ring-[#8fa31e] focus:border-[#8fa31e]"
+                id="userName"
+                className="w-full border-gray-200 p-3 !rounded-[5px] bg-white focus:!ring-[#8fa31e] focus:!border-[#8fa31e]"
                 onChange={handleChange}
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-md font-normal text-gray-500">Email</label>
+              <label className="text-md font-normal text-gray-500">Enter Email</label>
               <input
                 type="email"
                 placeholder=""
                 id="email"
-                className="w-full border-gray-200 p-3 rounded-md bg-white focus:ring-[#8fa31e] focus:border-[#8fa31e]"
+                className="w-full border-gray-200 p-3 !rounded-[5px] bg-white focus:!ring-[#8fa31e] focus:!border-[#8fa31e]"
                 onChange={handleChange}
               />
             </div>
 
             <div className="space-y-1 relative">
-              <label className="text-md font-normal text-gray-500">Password</label>
+              <label className="text-md font-normal text-gray-500">Enter Password</label>
               <div className="relative">
                 <input
                   type={inputType}
                   placeholder=""
                   id="password"
-                  className="w-full border-gray-200 p-3 rounded-md bg-white pr-12 focus:ring-[#8fa31e] focus:border-[#8fa31e]"
+                  className="w-full border-gray-200 p-3 !rounded-[5px] bg-white pr-12 focus:!ring-[#8fa31e] focus:!border-[#8fa31e]"
                   onChange={handleChange}
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#8fa31e]"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center top-6 !text-[#8fa31e]"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -166,19 +202,12 @@ export default function SignUp() {
               </div>
             </div>
 
-            {error && (
-              <Alert color="failure" onDismiss={() => dispatch(clearError())} className="m-4">
-                <span className="font-medium">Oops!</span> {error}
-              </Alert>
-            )}
-
             <button
               disabled={loading}
-              className="p-2 rounded-md bg-[#8fa31e] hover:bg-[#7a8c1a] text-white border-none"
+              className="p-2 rounded-[5px] !bg-[#8fa31e] hover:!bg-[#7a8c1a] text-white !rounded-[4px] border-none"
             >
               {loading ? "Creating account..." : "Sign Up"}
             </button>
-            <OAuth />
           </form>
 
           <div className="text-center pt-4">

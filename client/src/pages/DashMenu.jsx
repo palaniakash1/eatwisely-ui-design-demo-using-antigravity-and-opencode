@@ -8,6 +8,7 @@ import {
   DashboardLayout,
 } from "../components/DashboardLayout";
 import { FaTrash } from "react-icons/fa";
+import { useToast } from "../components/Toast";
 import restaurantsData from "../data/restaurants.json";
 
 const defaultMenuItems = [
@@ -18,7 +19,8 @@ const defaultMenuItems = [
 
 export default function DashMenu() {
   const { currentUser } = useSelector((state) => state.user)
-  const [menuItems, setMenuItems] = useState([])
+  const toast = useToast()
+  const [menuItems, setMenuItems] = useState([]))
   const [restaurants, setRestaurants] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -92,6 +94,7 @@ export default function DashMenu() {
     localStorage.setItem('menuItems', JSON.stringify(updatedMenu))
     setShowAddModal(false)
     setFormData({ name: '', description: '', price: '', category: '', restaurantId: '', isAvailable: true })
+    toast.success("Menu item added successfully!")
   }
 
   const handleEditMenuItem = () => {
@@ -102,12 +105,14 @@ export default function DashMenu() {
     localStorage.setItem('menuItems', JSON.stringify(updatedMenu))
     setShowEditModal(false)
     setSelectedItem(null)
+    toast.success("Menu item updated successfully!")
   }
 
   const handleDeleteMenuItem = (id) => {
     const updatedMenu = menuItems.filter(item => item._id !== id)
     setMenuItems(updatedMenu)
     localStorage.setItem('menuItems', JSON.stringify(updatedMenu))
+    toast.success("Menu item deleted successfully!")
   }
 
   const openEditModal = (item) => {

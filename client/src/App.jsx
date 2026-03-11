@@ -14,6 +14,7 @@ import DashCategories from './pages/DashCategories'
 import DashMenu from './pages/DashMenu'
 import DashAuditLog from './pages/DashAuditLog'
 import DashSettings from './pages/DashSettings'
+import DashProfile from './components/DashProfile'
 import PrivateRoute from './components/PrivateRoute'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="menu" element={<DashMenu />} />
             <Route path="auditlog" element={<DashAuditLog />} />
             <Route path="settings" element={<DashSettings />} />
+            <Route path="profile" element={<DashProfile />} />
           </Route>
         </Routes>
       </main>

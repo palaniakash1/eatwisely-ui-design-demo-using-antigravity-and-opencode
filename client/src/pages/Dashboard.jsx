@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { signOut } from '../redux/user/userSlice'
-import { FaUsers, FaUtensils, FaTags, FaList, FaCog, FaScroll, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa'
+import { FaUsers, FaUtensils, FaTags, FaList, FaCog, FaScroll, FaSignOutAlt, FaBars, FaTimes, FaUser } from 'react-icons/fa'
 
 const menuItems = [
   { id: 'users', label: 'Users', icon: FaUsers, path: '/dashboard/users' },
@@ -10,6 +10,7 @@ const menuItems = [
   { id: 'categories', label: 'Categories', icon: FaTags, path: '/dashboard/categories' },
   { id: 'menu', label: 'Menu', icon: FaList, path: '/dashboard/menu' },
   { id: 'auditlog', label: 'Audit Log', icon: FaScroll, path: '/dashboard/auditlog' },
+  { id: 'profile', label: 'Profile', icon: FaUser, path: '/dashboard/profile' },
 ]
 
 const bottomMenuItems = [
@@ -31,6 +32,7 @@ export default function Dashboard() {
     if (path.includes('/menu')) return 'menu'
     if (path.includes('/auditlog')) return 'auditlog'
     if (path.includes('/settings')) return 'settings'
+    if (path.includes('/profile')) return 'profile'
     return 'users'
   }
 

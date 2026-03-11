@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import {
   signInStart,
@@ -8,7 +8,7 @@ import {
 } from "../redux/user/userSlice"
 import { useDispatch, useSelector } from "react-redux"
 import OAuth from "../components/OAuth"
-import { Alert } from "flowbite-react"
+import { useToast } from "../components/Toast"
 import { validateUserCredentials } from "../services/userApi"
 
 const EyeIcon = (props) => (
@@ -54,9 +54,24 @@ export default function SignIn() {
   const { loading, error } = useSelector((state) => state.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const toast = useToast()
   const [localError, setLocalError] = useState(null)
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error)
+      dispatch(clearError())
+    }
+  }, [error, dispatch, toast])
+
+  useEffect(() => {
+    if (localError) {
+      toast.error(localError)
+      setLocalError(null)
+    }
+  }, [localError, toast])
 
   const handleChange = (e) => {
     if (error) dispatch(clearError())
@@ -79,15 +94,15 @@ export default function SignIn() {
     try {
       dispatch(signInStart())
       
-      const user = await validateUserCredentials(formData.email, formData.password)
+      const { user } = await validateUserCredentials(formData.email, formData.password)
       
       if (!user) {
         dispatch(signInFailure("Invalid email or password"))
         return
       }
 
-      const { password, ...userWithoutPassword } = user
-      dispatch(signInSuccess(userWithoutPassword))
+      dispatch(signInSuccess(user))
+      toast.success("Login successful!")
       navigate("/")
     } catch (error) {
       dispatch(signInFailure(error.message))
@@ -167,20 +182,6 @@ export default function SignIn() {
                   </button>
                 </div>
               </div>
-              
-              {(localError || error) && (
-                <Alert
-                  color="failure"
-                  onDismiss={() => {
-                    setLocalError(null)
-                    dispatch(clearError())
-                  }}
-                  className="m-4"
-                >
-                  <span className="font-medium">Oops!</span>{" "}
-                  {localError || error}
-                </Alert>
-              )}
               
               <button
                 disabled={loading}

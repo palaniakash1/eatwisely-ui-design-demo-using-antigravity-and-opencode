@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import {
   Table,
@@ -11,9 +11,9 @@ import {
 } from "flowbite-react";
 import { FaTrash, FaSearch, FaExclamation } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
+import { useToast } from "../components/Toast";
 
 import usersData from "../data/users.json";
-import restaurantsData from "../data/restaurants.json";
 import {
   DashboardHeader,
   DashboardContent,
@@ -22,6 +22,7 @@ import {
 
 export default function DashUsers() {
   const { currentUser } = useSelector((state) => state.user);
+  const toast = useToast();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,9 +36,14 @@ export default function DashUsers() {
     password: "",
     role: "user",
     isActive: true,
+    profilePicture: "",
   });
   const [roleFilter, setRoleFilter] = useState([]);
   const [statusFilter, setStatusFilter] = useState([]);
+  const fileInputRef = useRef(null);
+  const editFileInputRef = useRef(null);
+
+  const defaultProfilePicture = "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80";
 
   useEffect(() => {
     const storedUsers = localStorage.getItem("users");
@@ -110,8 +116,7 @@ export default function DashUsers() {
       ...formData,
       userName: formData.userName.toLowerCase(),
       email: formData.email.toLowerCase(),
-      profilePicture:
-        "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80",
+      profilePicture: formData.profilePicture || defaultProfilePicture,
       restaurantId: null,
       createdByAdminId: currentUser?._id,
       createdAt: new Date().toISOString(),
@@ -126,7 +131,9 @@ export default function DashUsers() {
       password: "",
       role: "user",
       isActive: true,
+      profilePicture: "",
     });
+    toast.success("User added successfully!");
   };
 
   const handleEditUser = () => {
@@ -137,6 +144,7 @@ export default function DashUsers() {
             ...formData,
             userName: formData.userName.toLowerCase(),
             email: formData.email.toLowerCase(),
+            profilePicture: formData.profilePicture || u.profilePicture || defaultProfilePicture,
           }
         : u,
     );
@@ -144,12 +152,14 @@ export default function DashUsers() {
     localStorage.setItem("users", JSON.stringify(updatedUsers));
     setShowEditModal(false);
     setSelectedUser(null);
+    toast.success("User updated successfully!");
   };
 
   const handleDeleteUser = (userId) => {
     const updatedUsers = users.filter((u) => u._id !== userId);
     setUsers(updatedUsers);
     localStorage.setItem("users", JSON.stringify(updatedUsers));
+    toast.success("User deleted successfully!");
   };
 
   const openEditModal = (user) => {
@@ -160,8 +170,24 @@ export default function DashUsers() {
       password: "",
       role: user.role,
       isActive: user.isActive,
+      profilePicture: user.profilePicture || "",
     });
     setShowEditModal(true);
+  };
+
+  const handleImageChange = (e, isEdit = false) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (isEdit) {
+        setFormData({ ...formData, profilePicture: reader.result });
+      } else {
+        setFormData({ ...formData, profilePicture: reader.result });
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const filterOptions = [
@@ -299,6 +325,31 @@ export default function DashUsers() {
           <Modal.Header>Add New User</Modal.Header>
           <Modal.Body>
             <div className="space-y-4">
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200">
+                    <img
+                      src={formData.profilePicture || defaultProfilePicture}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current.click()}
+                    className="absolute bottom-0 right-0 bg-[#8fa31e] text-white p-2 rounded-full hover:bg-[#7a8c1a] transition-colors"
+                  >
+                    <FaPencil className="w-3 h-3" />
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(e, false)}
+                    className="hidden"
+                  />
+                </div>
+              </div>
               <div>
                 <Label htmlFor="userName" value="Username" />
                 <TextInput
@@ -364,6 +415,31 @@ export default function DashUsers() {
           <Modal.Header>Edit User</Modal.Header>
           <Modal.Body>
             <div className="space-y-4">
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200">
+                    <img
+                      src={formData.profilePicture || selectedUser?.profilePicture || defaultProfilePicture}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => editFileInputRef.current.click()}
+                    className="absolute bottom-0 right-0 bg-[#8fa31e] text-white p-2 rounded-full hover:bg-[#7a8c1a] transition-colors"
+                  >
+                    <FaPencil className="w-3 h-3" />
+                  </button>
+                  <input
+                    type="file"
+                    ref={editFileInputRef}
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(e, true)}
+                    className="hidden"
+                  />
+                </div>
+              </div>
               <div>
                 <Label htmlFor="editUserName" value="Username" />
                 <TextInput
