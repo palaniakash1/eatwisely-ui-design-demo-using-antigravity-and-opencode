@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Card, TextInput, Button, Label } from "flowbite-react";
+import { useToast } from "../components/Toast";
 import {
   DashboardHeader,
   DashboardContent,
@@ -25,6 +26,7 @@ const ToggleSwitch = ({ checked, onChange, id }) => (
 
 export default function DashSettings() {
   const { currentUser } = useSelector((state) => state.user);
+  const toast = useToast();
 
   const [settings, setSettings] = useState({
     siteName: "EatWisely",
@@ -40,7 +42,7 @@ export default function DashSettings() {
 
   const handleSaveSettings = () => {
     localStorage.setItem("siteSettings", JSON.stringify(settings));
-    alert("Settings saved successfully!");
+    toast.success("Settings saved successfully!");
   };
 
   return (
