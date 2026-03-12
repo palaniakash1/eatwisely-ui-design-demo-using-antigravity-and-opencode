@@ -8,7 +8,8 @@ import {
   clearError,
 } from "../redux/user/userSlice"
 import { useToast } from "../components/Toast"
-import { createUserInJson } from "../services/userApi"
+import { signup as apiSignup } from "../services/api"
+import OAuth from "../components/OAuth"
 import wavepattern from "../assets/wavepattern.png"
 import logo from "../assets/eatwisely.ico"
 
@@ -63,7 +64,7 @@ export default function SignUp() {
       toast.error(error)
       dispatch(clearError())
     }
-  }, [error, dispatch, toast])
+  }, [error, toast, dispatch])
 
   const handleChange = (e) => {
     if (error) dispatch(clearError())
@@ -80,13 +81,18 @@ export default function SignUp() {
       dispatch(signInFailure("Please fill in all fields"))
       return
     }
+
+    if (formData.password.length < 8) {
+      dispatch(signInFailure("Password must be at least 8 characters"))
+      return
+    }
+
     try {
       dispatch(signInStart())
       
-      const { user } = await createUserInJson(formData)
-      dispatch(signInSuccess(user))
-      toast.success("Account created successfully!")
-      navigate("/")
+      await apiSignup(formData)
+      toast.success("Account created! Please sign in.")
+      navigate("/sign-in")
     } catch (error) {
       dispatch(signInFailure(error.message))
     }
@@ -208,6 +214,17 @@ export default function SignUp() {
             >
               {loading ? "Creating account..." : "Sign Up"}
             </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or</span>
+              </div>
+            </div>
+
+            <OAuth />
           </form>
 
           <div className="text-center pt-4">
