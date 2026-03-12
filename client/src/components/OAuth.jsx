@@ -37,7 +37,8 @@ export default function OAuth() {
           name: resultFromGoogle.user.displayName,
           email: resultFromGoogle.user.email,
           googlePhotoUrl: resultFromGoogle.user.photoURL
-        })
+        }),
+        credentials: 'include',
       });
       const data = await res.json();
       if (res.ok) {

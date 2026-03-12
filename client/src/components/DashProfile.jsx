@@ -19,7 +19,8 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
-  signOutSuccess
+  signOutSuccess,
+  clearError
 } from '../redux/user/userSlice';
 import { logoutUser, updateUserInJson, deleteUserFromJson } from '../services/userApi';
 import { HiOutlineExclamationCircle, HiTrash } from 'react-icons/hi';
@@ -117,7 +118,6 @@ export default function DashProfile() {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log('Uploaded image URL:', downloadURL);
           setImageFileUrl(downloadURL);
           setIsUploading(false);
           setFormData((prev) => ({ ...prev, profilePicture: downloadURL }));
@@ -139,12 +139,18 @@ export default function DashProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isUploading) {
+      toast.error('Please wait for the image upload to complete');
+      return;
+    }
+
     if (Object.keys(formData).length === 0) {
       toast.error('No changes made to update');
       return;
     }
 
     try {
+      dispatch(clearError());
       dispatch(updateUserStart());
       const updatedUser = await updateUserInJson(currentUser._id, formData);
       dispatch(updateUserSuccess(updatedUser));
@@ -152,7 +158,6 @@ export default function DashProfile() {
       setFormData({});
     } catch (error) {
       dispatch(updateUserFailure(error.message));
-      toast.error(error.message);
     }
   };
 
@@ -269,10 +274,32 @@ export default function DashProfile() {
               <div className="lg:col-span-2 flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-center mt-4 border-t pt-6">
                 <Button
                   type="submit"
-                  className=" w-full lg:w-[30%] !bg-[#8fa31e] hover:!bg-[#7a8c1a] text-white !rounded-[4px] border-none"
-                  disabled={loading}
+                  className={`w-full lg:w-[30%] !rounded-[4px] border-none text-white font-medium transition-all duration-300 ${
+                    isUploading || loading
+                      ? '!bg-[#8fa31e]/60 cursor-not-allowed opacity-70'
+                      : '!bg-[#8fa31e] hover:!bg-[#7a8c1a] hover:shadow-lg hover:scale-[1.02]'
+                  }`}
+                  disabled={loading || isUploading}
                 >
-                  {loading ? 'loading...' : 'Update'}
+                  {isUploading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </span>
+                  ) : loading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </span>
+                  ) : (
+                    'Update'
+                  )}
                 </Button>
 
                 <div className=" w-full flex gap-3 lg:w-[30%] lg:gap-5">

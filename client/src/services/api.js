@@ -7,12 +7,17 @@ export const signup = async (userData) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(userData),
+    credentials: 'include',
   });
 
   const data = await res.json();
 
   if (!res.ok) {
     throw new Error(data.message || 'Signup failed');
+  }
+
+  if (data.csrfToken) {
+    localStorage.setItem('csrfToken', data.csrfToken);
   }
 
   return data;
@@ -25,6 +30,7 @@ export const login = async (email, password) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
+    credentials: 'include',
   });
 
   const data = await res.json();

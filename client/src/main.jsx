@@ -8,6 +8,12 @@ import { ToastProvider } from './components/Toast'
 import App from './App.jsx'
 import './index.css'
 
+if (typeof window !== 'undefined') {
+  localStorage.removeItem('eatwisely_users_json');
+  localStorage.removeItem('eatwisely_users');
+  localStorage.removeItem('users');
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>

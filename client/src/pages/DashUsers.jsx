@@ -12,18 +12,18 @@ import {
 import { FaTrash, FaSearch, FaExclamation } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import { useToast } from "../components/Toast";
-
-import usersData from "../data/users.json";
 import {
   DashboardHeader,
   DashboardContent,
   DashboardLayout,
 } from "../components/DashboardLayout";
+import { getAllUsers, createUser, updateUserInJson, deleteUserFromJson } from "../services/userApi";
 
 export default function DashUsers() {
   const { currentUser } = useSelector((state) => state.user);
   const toast = useToast();
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -45,14 +45,24 @@ export default function DashUsers() {
 
   const defaultProfilePicture = "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80";
 
-  useEffect(() => {
-    const storedUsers = localStorage.getItem("users");
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    } else {
-      setUsers(usersData);
-      localStorage.setItem("users", JSON.stringify(usersData));
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllUsers();
+      if (data.success && data.data) {
+        setUsers(data.data);
+      } else if (Array.isArray(data)) {
+        setUsers(data);
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch users");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
   const roleOptions = [
@@ -110,56 +120,59 @@ export default function DashUsers() {
     setCurrentPage(1);
   };
 
-  const handleAddUser = () => {
-    const newUser = {
-      _id: Date.now().toString(),
-      ...formData,
-      userName: formData.userName.toLowerCase(),
-      email: formData.email.toLowerCase(),
-      profilePicture: formData.profilePicture || defaultProfilePicture,
-      restaurantId: null,
-      createdByAdminId: currentUser?._id,
-      createdAt: new Date().toISOString(),
-    };
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setShowAddModal(false);
-    setFormData({
-      userName: "",
-      email: "",
-      password: "",
-      role: "user",
-      isActive: true,
-      profilePicture: "",
-    });
-    toast.success("User added successfully!");
+  const handleAddUser = async () => {
+    try {
+      const newUserData = {
+        ...formData,
+        userName: formData.userName.toLowerCase(),
+        email: formData.email.toLowerCase(),
+        profilePicture: formData.profilePicture || defaultProfilePicture,
+      };
+      
+      await createUser(newUserData);
+      toast.success("User added successfully!");
+      setShowAddModal(false);
+      setFormData({
+        userName: "",
+        email: "",
+        password: "",
+        role: "user",
+        isActive: true,
+        profilePicture: "",
+      });
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.message || "Failed to add user");
+    }
   };
 
-  const handleEditUser = () => {
-    const updatedUsers = users.map((u) =>
-      u._id === selectedUser._id
-        ? {
-            ...u,
-            ...formData,
-            userName: formData.userName.toLowerCase(),
-            email: formData.email.toLowerCase(),
-            profilePicture: formData.profilePicture || u.profilePicture || defaultProfilePicture,
-          }
-        : u,
-    );
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setShowEditModal(false);
-    setSelectedUser(null);
-    toast.success("User updated successfully!");
+  const handleEditUser = async () => {
+    try {
+      const updates = {
+        ...formData,
+        userName: formData.userName.toLowerCase(),
+        email: formData.email.toLowerCase(),
+        profilePicture: formData.profilePicture || selectedUser?.profilePicture || defaultProfilePicture,
+      };
+      
+      await updateUserInJson(selectedUser._id, updates);
+      toast.success("User updated successfully!");
+      setShowEditModal(false);
+      setSelectedUser(null);
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.message || "Failed to update user");
+    }
   };
 
-  const handleDeleteUser = (userId) => {
-    const updatedUsers = users.filter((u) => u._id !== userId);
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    toast.success("User deleted successfully!");
+  const handleDeleteUser = async (userId) => {
+    try {
+      await deleteUserFromJson(userId);
+      toast.success("User deleted successfully!");
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.message || "Failed to delete user");
+    }
   };
 
   const openEditModal = (user) => {
@@ -238,7 +251,13 @@ export default function DashUsers() {
               <Table.HeadCell>Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {paginatedUsers.length === 0 ? (
+              {loading ? (
+                <Table.Row>
+                  <Table.Cell colSpan={6} className="text-center py-8 text-gray-500">
+                    Loading users...
+                  </Table.Cell>
+                </Table.Row>
+              ) : paginatedUsers.length === 0 ? (
                 <Table.Row>
                   <Table.Cell
                     colSpan={6}

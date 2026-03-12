@@ -1,28 +1,18 @@
-import { useState } from 'react'
-
-export default function ImageCircleLoader({ src, alt, size = 60 }) {
-  const [loaded, setLoaded] = useState(false)
-  const [error, setError] = useState(false)
+export default function ImageCircleLoader({ progress }) {
+  const scale = 0.6 + (progress / 100) * 0.5;
 
   return (
-    <div
-      className="relative rounded-full overflow-hidden bg-gray-200"
-      style={{ width: size, height: size }}
-    >
-      {!loaded && !error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-          <div className="animate-spin rounded-full h-1/2 w-1/2 border-2 border-[#8fa31e] border-t-transparent" />
-        </div>
-      )}
-      <img
-        src={error ? '/placeholder-avatar.png' : src}
-        alt={alt}
-        onLoad={() => setLoaded(true)}
-        onError={() => setError(true)}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          loaded ? 'opacity-100' : 'opacity-0'
-        }`}
+    <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm">
+      <div
+        className={`absolute inset-0 rounded-full bg-gradient-to-br from-[#8fa31e] via-[#9bb82e] to-[#6d7f1a] shadow-lg`}
+        style={{
+          transform: `scale(${scale})`,
+          transition: "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        }}
       />
+      <div className="relative z-10 text-white font-bold text-lg drop-shadow-md">
+        {progress}%
+      </div>
     </div>
-  )
+  );
 }
