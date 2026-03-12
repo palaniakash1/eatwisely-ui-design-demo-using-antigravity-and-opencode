@@ -44,6 +44,7 @@
     "ioredis": "^5.9.3",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.1.0",
     "mongoose": "^9.0.0",
     "nodemon": "^3.1.11",
     "react-circular-progressbar": "^2.2.0",

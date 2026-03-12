@@ -108,7 +108,7 @@ export const signup = async (req, res, next) => {
     const newUser = await createUser({
       userName: normalizedUserName,
       email: normalizedEmail,
-      password: hashPassword(password),
+      password: await hashPassword(password),
       role: 'user'
     });
 
