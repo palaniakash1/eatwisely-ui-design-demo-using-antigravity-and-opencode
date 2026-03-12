@@ -20,7 +20,7 @@ const defaultMenuItems = [
 export default function DashMenu() {
   const { currentUser } = useSelector((state) => state.user)
   const toast = useToast()
-  const [menuItems, setMenuItems] = useState([]))
+  const [menuItems, setMenuItems] = useState([])
   const [restaurants, setRestaurants] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)

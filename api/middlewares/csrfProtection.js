@@ -174,7 +174,7 @@ export const createCookieCsrfGuard = (options = {}) => {
     tokenHeader = 'x-csrf-token',
     tokenCookie = 'csrf_token',
     unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'],
-    excludePaths = ['/api/auth/signin', '/api/auth/signup', '/api/auth/google']
+    excludePaths = ['/signin', '/signup', '/google', '/auth/signin', '/auth/signup', '/auth/google']
   } = options;
 
   return (req, res, next) => {
@@ -182,7 +182,8 @@ export const createCookieCsrfGuard = (options = {}) => {
       return next();
     }
 
-    if (excludePaths.some((path) => req.path.startsWith(path))) {
+    const fullPath = req.path;
+    if (excludePaths.some((path) => fullPath.endsWith(path) || fullPath.includes(path))) {
       return next();
     }
 
