@@ -312,7 +312,7 @@ export const google = async (req, res, next) => {
         (name || 'user').toLowerCase().split(' ').join('') +
         Math.random().toString(9).slice(-4),
       email: normalizedEmail,
-      password: hashPassword(generatedPassword),
+      password: await hashPassword(generatedPassword),
       profilePicture: googlePhotoUrl,
       role: 'user'
     });
@@ -697,7 +697,7 @@ export const changePassword = async (req, res, next) => {
       return next(errorHandler(401, 'Current password is invalid'));
     }
 
-    user.password = hashPassword(newPassword);
+    user.password = await hashPassword(newPassword);
     await user.save();
 
     await logAudit({

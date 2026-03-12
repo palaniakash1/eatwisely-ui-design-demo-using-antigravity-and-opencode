@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useMemo } from 'react'
 import { HiCheck, HiExclamation, HiInformationCircle, HiX } from 'react-icons/hi'
 
 const ToastContext = createContext(null)
@@ -14,12 +14,12 @@ export function ToastProvider({ children }) {
     }, duration)
   }, [])
 
-  const toast = {
+  const toast = useMemo(() => ({
     success: (message) => addToast(message, 'success'),
     error: (message) => addToast(message, 'error'),
     info: (message) => addToast(message, 'info'),
     warning: (message) => addToast(message, 'warning'),
-  }
+  }), [addToast])
 
   const removeToast = (id) => {
     setToasts(prev => prev.filter(t => t.id !== id))

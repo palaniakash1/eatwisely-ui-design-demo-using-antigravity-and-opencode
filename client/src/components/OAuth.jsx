@@ -12,6 +12,16 @@ export default function OAuth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const preloadImage = (src) => {
+    if (!src) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      img.src = src;
+    });
+  };
+
   const handleGoogleClick = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
@@ -31,13 +41,14 @@ export default function OAuth() {
       });
       const data = await res.json();
       if (res.ok) {
+        await preloadImage(data.profilePicture);
         dispatch(signInSuccess(data));
         navigate('/');
       } else {
-        console.error('OAuth sign-in failed');
+        console.error('OAuth sign-in failed:', data);
       }
     } catch (error) {
-      console.log(error);
+      console.log('Google sign-in error:', error);
     }
   };
 
@@ -49,7 +60,7 @@ export default function OAuth() {
       onClick={handleGoogleClick}
     >
       <AiFillGoogleCircle className="w-6 h-6 mr-2" />
-      Signin with Google
+      Signup with Google
     </Button>
   );
 }

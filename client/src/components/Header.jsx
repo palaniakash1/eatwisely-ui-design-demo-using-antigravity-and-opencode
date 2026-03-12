@@ -92,7 +92,7 @@ export default function Header() {
                 inline
                 label={
                   <Avatar
-                    img={currentUser.profilePicture || 'https://via.placeholder.com/40'}
+                    img={currentUser.profilePicture || 'https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80'}
                     rounded
                     size="sm"
                     className="cursor-pointer border-2 border-[#8fa31e]"

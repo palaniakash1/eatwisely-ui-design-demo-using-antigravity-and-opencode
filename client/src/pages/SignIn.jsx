@@ -59,6 +59,16 @@ export default function SignIn() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
+  const preloadImage = (src) => {
+    if (!src) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      img.src = src;
+    });
+  };
+
   useEffect(() => {
     if (error) {
       toast.error(error)
@@ -101,6 +111,7 @@ export default function SignIn() {
         return
       }
 
+      await preloadImage(user.profilePicture);
       dispatch(signInSuccess(user))
       toast.success("Login successful!")
       navigate("/")
