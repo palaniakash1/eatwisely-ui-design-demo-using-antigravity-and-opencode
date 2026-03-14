@@ -1,17 +1,17 @@
 import { NavLink } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { HiHome, HiUser, HiCollection, HiMenuAlt2, HiStar, HiCog, HiLogout, HiUserCircle } from 'react-icons/hi'
+import { HiHome, HiUser, HiCollection, HiMenuAlt2, HiStar, HiCog, HiLogout, HiUserCircle, HiDocumentText } from 'react-icons/hi'
 import { signOutSuccess } from '../redux/user/userSlice'
 import { logoutUser } from '../services/userApi'
 
 const navItems = [
-  { name: 'Overview', path: '/dashboard', icon: HiHome },
+  { name: 'Dashboard', path: '/dashboard', icon: HiHome },
+  { name: 'Profile', path: '/dashboard/profile', icon: HiUserCircle },
+  { name: 'Users', path: '/dashboard/users', icon: HiUser },
   { name: 'Restaurants', path: '/dashboard/restaurants', icon: HiMenuAlt2 },
   { name: 'Categories', path: '/dashboard/categories', icon: HiCollection },
   { name: 'Menu', path: '/dashboard/menu', icon: HiMenuAlt2 },
-  { name: 'Users', path: '/dashboard/users', icon: HiUser },
-  { name: 'Reviews', path: '/dashboard/reviews', icon: HiStar },
-  { name: 'Profile', path: '/dashboard/profile', icon: HiUserCircle },
+  { name: 'Audit Log', path: '/dashboard/audit-log', icon: HiDocumentText },
 ]
 
 export default function DashSidebar({ isOpen, onClose }) {

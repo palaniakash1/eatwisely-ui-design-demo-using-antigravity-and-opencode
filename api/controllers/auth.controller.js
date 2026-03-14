@@ -108,7 +108,7 @@ export const signup = async (req, res, next) => {
     const newUser = await createUser({
       userName: normalizedUserName,
       email: normalizedEmail,
-      password: await hashPassword(password),
+      password: hashPassword(password),
       role: 'user'
     });
 
@@ -312,7 +312,7 @@ export const google = async (req, res, next) => {
         (name || 'user').toLowerCase().split(' ').join('') +
         Math.random().toString(9).slice(-4),
       email: normalizedEmail,
-      password: await hashPassword(generatedPassword),
+      password: hashPassword(generatedPassword),
       profilePicture: googlePhotoUrl,
       role: 'user'
     });
@@ -697,7 +697,7 @@ export const changePassword = async (req, res, next) => {
       return next(errorHandler(401, 'Current password is invalid'));
     }
 
-    user.password = await hashPassword(newPassword);
+    user.password = hashPassword(newPassword);
     await user.save();
 
     await logAudit({

@@ -1,4 +1,4 @@
-import { userService } from '../services/user.service.js';
+import userService from '../services/user.service.js';
 
 export const test = (req, res) => {
   res.json({ message: 'API test message is displaying' });

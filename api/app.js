@@ -68,7 +68,6 @@ app.use((req, res, next) => {
   );
   res.header('X-Content-Type-Options', 'nosniff');
   res.header('Referrer-Policy', 'no-referrer');
-  res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
   }

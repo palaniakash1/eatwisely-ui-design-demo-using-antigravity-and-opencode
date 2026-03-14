@@ -30,8 +30,7 @@ const messages = {
   },
   objectId: 'Invalid ID format. Please provide a valid 24-character hex string',
   pattern: {
-    objectId:
-      'Invalid ID format. Please provide a valid 24-character hex string (e.g., "507f1f77bcf86cd799439011")'
+    objectId: 'Invalid ID format. Please provide a valid 24-character hex string (e.g., "507f1f77bcf86cd799439011")'
   }
 };
 

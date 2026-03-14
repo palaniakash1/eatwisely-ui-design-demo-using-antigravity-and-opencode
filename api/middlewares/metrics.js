@@ -106,11 +106,11 @@ export const createMetricsEndpoint = () => {
       const mean =
         latencySamples.length > 0
           ? Number(
-              (
-                latencySamples.reduce((sum, value) => sum + value, 0) /
+            (
+              latencySamples.reduce((sum, value) => sum + value, 0) /
                 latencySamples.length
-              ).toFixed(2)
-            )
+            ).toFixed(2)
+          )
           : 0;
       const securityTelemetry = await getSecurityTelemetry();
 

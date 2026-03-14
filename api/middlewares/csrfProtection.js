@@ -131,10 +131,7 @@ export const createCsrfMiddleware = (options = {}) => {
     // In production, you might want to require it
     if (!csrfToken) {
       // Log but don't block (API security handled by JWT)
-      logger.warn('csrf.token_missing_allowed', {
-        path: req.path,
-        method: req.method
-      });
+      logger.warn('csrf.token_missing_allowed', { path: req.path, method: req.method });
       return next();
     }
 
@@ -174,7 +171,7 @@ export const createCookieCsrfGuard = (options = {}) => {
     tokenHeader = 'x-csrf-token',
     tokenCookie = 'csrf_token',
     unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'],
-    excludePaths = ['/signin', '/signup', '/google', '/auth/signin', '/auth/signup', '/auth/google']
+    excludePaths = ['/api/auth/signin', '/api/auth/signup', '/api/auth/google']
   } = options;
 
   return (req, res, next) => {
@@ -182,8 +179,7 @@ export const createCookieCsrfGuard = (options = {}) => {
       return next();
     }
 
-    const fullPath = req.path;
-    if (excludePaths.some((path) => fullPath.endsWith(path) || fullPath.includes(path))) {
+    if (excludePaths.some((path) => req.path.startsWith(path))) {
       return next();
     }
 

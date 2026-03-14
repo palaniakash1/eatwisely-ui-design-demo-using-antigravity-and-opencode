@@ -1,9 +1,6 @@
-export const errorHandler = (statusCode, message, errors = null) => {
-  const error = new Error(message);
+export const errorHandler = (statusCode, message) => {
+  const error = new Error();
   error.statusCode = statusCode;
-  if (errors) {
-    error.errors = errors;
-  }
-  error.isOperational = true;
+  error.message = message;
   return error;
 };

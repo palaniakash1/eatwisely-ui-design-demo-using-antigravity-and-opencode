@@ -102,7 +102,7 @@ export const createErrorHandler = (options = {}) => {
 
     // Handle Mongoose validation errors
     if (err instanceof mongoose.Error.ValidationError) {
-      const messages = Object.values(err.errors).map((e) => e.message);
+      const messages = Object.values(err.errors).map(e => e.message);
       return res.status(400).json({
         success: false,
         requestId,
@@ -188,9 +188,7 @@ export const createErrorHandler = (options = {}) => {
  */
 export const createNotFoundHandler = () => {
   return (req, res, next) => {
-    const error = new Error(
-      `Route not found: ${req.method} ${req.originalUrl}`
-    );
+    const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
     error.statusCode = 404;
     error.isOperational = true;
     next(error);

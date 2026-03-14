@@ -144,7 +144,10 @@ export const createHealthCheck = (options = {}) => {
 
 // New functions for enhanced environment testing
 const validateEnvironment = () => {
-  const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
+  const requiredEnvVars = [
+    'JWT_SECRET',
+    'DATABASE_URL'
+  ];
 
   const missingVars = requiredEnvVars.filter((varName) => {
     if (varName === 'JWT_SECRET') return !config.jwtSecret;
@@ -154,9 +157,7 @@ const validateEnvironment = () => {
   const warnings = [];
 
   if (!config.googleMapsApiKey) {
-    warnings.push(
-      'GOOGLE_MAPS_API_KEY not configured; address geocoding will fail'
-    );
+    warnings.push('GOOGLE_MAPS_API_KEY not configured; address geocoding will fail');
   }
 
   return {
