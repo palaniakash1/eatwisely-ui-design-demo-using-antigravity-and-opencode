@@ -45,7 +45,42 @@
     "adminId": "507f1f77bcf86cd799439011",
     "status": "published",
     "isActive": true,
-    "searchText": "the green kitchen organic vegan healthy london"
+    "searchText": "the green kitchen organic vegan healthy london",
+    "menu": [
+      {
+        "categoryId": { "_id": "cat1", "name": "Starters" },
+        "category": "Starters",
+        "items": [
+          { "name": "Bruschetta", "description": "Toasted bread with fresh tomatoes and basil", "price": 6.99, "image": "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=200", "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Bread", "allergens": ["gluten"] }, { "name": "Tomatoes" }, { "name": "Basil" }], "nutrition": { "calories": { "value": 180, "level": "green" }, "fat": { "value": 6, "level": "green" }, "saturates": { "value": 1, "level": "green" }, "sugar": { "value": 3, "level": "green" }, "salt": { "value": 0.5, "level": "green" } } },
+          { "name": "Soup of the Day", "description": "Fresh seasonal soup with crusty bread", "price": 5.49, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Seasonal vegetables", "allergens": [] }], "nutrition": { "calories": { "value": 220, "level": "green" } } }
+        ]
+      },
+      {
+        "categoryId": { "_id": "cat2", "name": "Main Courses" },
+        "category": "Main Courses",
+        "items": [
+          { "name": "Grilled Salmon", "description": "Wild-caught salmon with quinoa and steamed vegetables", "price": 18.99, "isAvailable": true, "dietary": { "vegetarian": false, "vegan": false }, "ingredients": [{ "name": "Salmon", "allergens": ["fish"] }, { "name": "Quinoa" }, { "name": "Vegetables" }], "nutrition": { "calories": { "value": 450, "level": "amber" }, "fat": { "value": 22, "level": "amber" }, "saturates": { "value": 4, "level": "green" }, "sugar": { "value": 5, "level": "green" }, "salt": { "value": 1.2, "level": "green" } }, "upsells": [{ "label": "Extra Quinoa", "price": 2.50 }] },
+          { "name": "Veggie Buddha Bowl", "description": " Roasted sweet potato, chickpeas, avocado, and tahini dressing", "price": 14.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Sweet potato", "allergens": [] }, { "name": "Chickpeas", "allergens": [] }, { "name": "Avocado", "allergens": [] }, { "name": "Tahini", "allergens": ["sesame"] }], "nutrition": { "calories": { "value": 520, "level": "amber" } }, "isMeal": true },
+          { "name": "Mushroom Risotto", "description": "Creamy arborio rice with wild mushrooms and truffle oil", "price": 15.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Arborio rice", "allergens": [] }, { "name": "Wild mushrooms", "allergens": [] }, { "name": "Parmesan", "allergens": ["milk"] }], "nutrition": { "calories": { "value": 580, "level": "amber" } } }
+        ]
+      },
+      {
+        "categoryId": { "_id": "cat3", "name": "Desserts" },
+        "category": "Desserts",
+        "items": [
+          { "name": "Chocolate Brownie", "description": "Rich chocolate brownie with vanilla ice cream", "price": 7.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Dark chocolate", "allergens": ["milk", "egg"] }, { "name": "Ice cream", "allergens": ["milk", "egg"] }], "strict": false },
+          { "name": "Fresh Fruit Salad", "description": "Seasonal fruits with honey and mint", "price": 5.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Seasonal fruits" }], "nutrition": { "calories": { "value": 120, "level": "green" } } }
+        ]
+      },
+      {
+        "categoryId": { "_id": "cat4", "name": "Beverages" },
+        "category": "Beverages",
+        "items": [
+          { "name": "Fresh Smoothie", "description": "Mixed berry smoothie with almond milk", "price": 4.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Berries", "allergens": [] }, { "name": "Almond milk", "allergens": ["tree_nuts"] }], "nutrition": { "calories": { "value": 150, "level": "green" } } },
+          { "name": "Organic Coffee", "description": "Fair trade espresso or cappuccino", "price": 3.49, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false } }
+        ]
+      }
+    ]
   },
   {
     "_id": "2",
@@ -92,7 +127,26 @@
     "adminId": "507f1f77bcf86cd799439011",
     "status": "published",
     "isActive": true,
-    "searchText": "spice route indian curry brick lane london"
+    "searchText": "spice route indian curry brick lane london",
+    "menu": [
+      { "categoryId": { "_id": "cat5", "name": "Starters" }, "category": "Starters", "items": [
+        { "name": "Samosa", "description": "Crispy pastry filled with spiced potatoes and peas", "price": 4.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Pastry", "allergens": ["gluten"] }, { "name": "Potatoes" }, { "name": "Peas" }] },
+        { "name": "Pakora", "description": "Deep fried vegetable fritters with mint chutney", "price": 5.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Mixed vegetables", "allergens": [] }, { "name": "Chickpea flour", "allergens": [] }] }
+      ]},
+      { "categoryId": { "_id": "cat6", "name": "Main Course" }, "category": "Main Course", "items": [
+        { "name": "Butter Chicken", "description": "Tender chicken in creamy tomato sauce", "price": 14.99, "isAvailable": true, "dietary": { "vegetarian": false, "vegan": false }, "ingredients": [{ "name": "Chicken", "allergens": [] }, { "name": "Tomato sauce", "allergens": ["milk"] }, { "name": "Cream", "allergens": ["milk"] }], "nutrition": { "calories": { "value": 650, "level": "red" } }, "isMeal": true },
+        { "name": "Palak Paneer", "description": "Spinach curry with cottage cheese", "price": 12.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Spinach", "allergens": [] }, { "name": "Paneer", "allergens": ["milk"] }], "nutrition": { "calories": { "value": 380, "level": "amber" } } },
+        { "name": "Dal Makhani", "description": "Slow cooked black lentils in creamy sauce", "price": 11.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Black lentils", "allergens": [] }, { "name": "Cream", "allergens": ["milk"] }], "nutrition": { "calories": { "value": 320, "level": "green" } } }
+      ]},
+      { "categoryId": { "_id": "cat7", "name": "Breads" }, "category": "Breads", "items": [
+        { "name": "Garlic Naan", "description": "Soft bread topped with garlic and butter", "price": 3.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Flour", "allergens": ["gluten"] }, { "name": "Garlic", "allergens": [] }, { "name": "Butter", "allergens": ["milk"] }], "strict": true, "removable": false },
+        { "name": "Plain Naan", "description": "Traditional soft bread", "price": 2.49, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Flour", "allergens": ["gluten"] }] }
+      ]},
+      { "categoryId": { "_id": "cat8", "name": "Drinks" }, "category": "Drinks", "items": [
+        { "name": "Mango Lassi", "description": "Sweet yogurt drink with mango", "price": 4.49, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": false }, "ingredients": [{ "name": "Yogurt", "allergens": ["milk"] }, { "name": "Mango" }] },
+        { "name": "Masala Chai", "description": "Spiced Indian tea", "price": 2.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Tea", "allergens": [] }, { "name": "Spices", "allergens": [] }] }
+      ]}
+    ]
   },
   {
     "_id": "3",
@@ -138,7 +192,22 @@
     "adminId": "507f1f77bcf86cd799439011",
     "status": "published",
     "isActive": true,
-    "searchText": "sakura japanese sushi soho london"
+    "searchText": "sakura japanese sushi soho london",
+    "menu": [
+      { "categoryId": { "_id": "cat9", "name": "Appetizers" }, "category": "Appetizers", "items": [
+        { "name": "Edamame", "description": "Steamed soybeans with sea salt", "price": 4.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Soybeans", "allergens": ["soya"] }] },
+        { "name": "Miso Soup", "description": "Traditional soup with tofu and seaweed", "price": 3.49, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Miso paste", "allergens": ["soya"] }, { "name": "Tofu", "allergens": ["soya"] }, { "name": "Seaweed", "allergens": [] }] }
+      ]},
+      { "categoryId": { "_id": "cat10", "name": "Sushi" }, "category": "Sushi", "items": [
+        { "name": "Salmon Nigiri (2 pcs)", "description": "Fresh salmon on seasoned rice", "price": 6.99, "isAvailable": true, "dietary": { "vegetarian": false, "vegan": false }, "ingredients": [{ "name": "Salmon", "allergens": ["fish"] }, { "name": "Rice", "allergens": [] }], "strict": true, "removable": false },
+        { "name": "Tuna Roll", "description": "Tuna wrapped in cucumber with sushi rice", "price": 8.99, "isAvailable": true, "dietary": { "vegetarian": false, "vegan": false }, "ingredients": [{ "name": "Tuna", "allergens": ["fish"] }, { "name": "Cucumber", "allergens": [] }, { "name": "Rice", "allergens": [] }] },
+        { "name": "Vegetable Roll", "description": "Assorted vegetables with avocado", "price": 7.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Cucumber", "allergens": [] }, { "name": "Avocado", "allergens": [] }, { "name": "Carrot", "allergens": [] }, { "name": "Rice", "allergens": [] }] }
+      ]},
+      { "categoryId": { "_id": "cat11", "name": "Hot Dishes" }, "category": "Hot Dishes", "items": [
+        { "name": "Chicken Teriyaki", "description": "Grilled chicken with teriyaki sauce and rice", "price": 13.99, "isAvailable": true, "dietary": { "vegetarian": false, "vegan": false }, "ingredients": [{ "name": "Chicken", "allergens": [] }, { "name": "Teriyaki sauce", "allergens": ["soya"] }, { "name": "Rice", "allergens": [] }], "isMeal": true },
+        { "name": "Tofu Steak", "description": "Crispy tofu with garlic sauce", "price": 11.99, "isAvailable": true, "dietary": { "vegetarian": true, "vegan": true }, "ingredients": [{ "name": "Tofu", "allergens": ["soya"] }, { "name": "Garlic", "allergens": [] }] }
+      ]}
+    ]
   },
   {
     "_id": "4",
