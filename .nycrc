@@ -1,0 +1,16 @@
+{
+  "reporter": ["html", "text", "text-summary"],
+  "exclude": [
+    "coverage/**",
+    "node_modules/**",
+    "api/tests/**",
+    "**/*.test.js",
+    "**/*.spec.js",
+    "coverage-runner.cjs"
+  ],
+  "cache": false,
+  "produceSourceMap": false,
+  "include": [
+    "api/**/*.js"
+  ]
+}

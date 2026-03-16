@@ -78,6 +78,10 @@ const config = {
       toOptionalString(process.env.APP_VERSION) || '1.0.0',
     exporterUrl: toOptionalString(process.env.OTEL_EXPORTER_OTLP_ENDPOINT),
     jaegerEndpoint: toOptionalString(process.env.OTEL_EXPORTER_JAEGER_ENDPOINT)
+  },
+  healthCheck: {
+    includeMongo: String(process.env.HEALTH_CHECK_INCLUDE_MONGO || 'false') === 'true',
+    includeDeps: String(process.env.HEALTH_CHECK_INCLUDE_DEPS || 'false') === 'true'
   }
 };
 
