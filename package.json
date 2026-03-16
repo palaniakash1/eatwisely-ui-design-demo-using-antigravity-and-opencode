@@ -59,6 +59,7 @@
     "eslint-config-prettier": "^10.1.8",
     "mongodb-memory-server": "^10.3.0",
     "nyc": "^18.0.0",
+    "redis-cli": "^2.1.2",
     "supertest": "^7.1.4",
     "tailwind-scrollbar": "^4.0.2"
   }
