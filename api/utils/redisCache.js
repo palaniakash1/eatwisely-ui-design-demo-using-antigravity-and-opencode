@@ -11,6 +11,7 @@ const memoryCounters = new Map();
 
 let redisClient = null;
 let isRedisAvailable = false;
+let redisClientExplicitlySet = false;
 
 const memoryGet = (key) => {
   const expiry = memoryCacheTTL.get(key);
@@ -40,6 +41,16 @@ export const initRedis = async () => {
   if (!redisUrl) {
     logger.info('redis.disabled', { reason: 'missing REDIS_URL' });
     isRedisAvailable = false;
+    return false;
+  }
+
+  if (isRedisAvailable && redisClient) {
+    logger.info('redis.already_connected', {});
+    return true;
+  }
+
+  if (redisClientExplicitlySet) {
+    logger.info('redis.test_disabled', { reason: 'test state set' });
     return false;
   }
 
@@ -218,11 +229,8 @@ export const getCacheStats = () => ({
 });
 
 export const __setRedisTestState = ({ client = null, available = false } = {}) => {
-  if (config.env !== 'test') {
-    throw new Error('__setRedisTestState is only available in tests');
-  }
-
   redisClient = client;
+  redisClientExplicitlySet = true;
   isRedisAvailable = Boolean(client) && Boolean(available);
 };
 
