@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import {
   signInStart,
   signInSuccess,
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux"
 import OAuth from "../components/OAuth"
 import { useToast } from "../components/Toast"
 import { validateUserCredentials } from "../services/userApi"
+import { getDefaultRouteByRole } from "../utils/auth"
 
 const EyeIcon = (props) => (
   <svg
@@ -112,9 +113,19 @@ export default function SignIn() {
       }
 
       await preloadImage(user.profilePicture);
-      dispatch(signInSuccess(user))
+      
+      const userRole = user.role || user.userRole || 'user';
+      
+      dispatch(signInSuccess({
+        user,
+        role: userRole,
+        token: user.token || localStorage.getItem('token')
+      }))
+      
       toast.success("Login successful!")
-      navigate("/")
+      
+      const redirectPath = getDefaultRouteByRole(userRole);
+      navigate(redirectPath)
     } catch (error) {
       dispatch(signInFailure(error.message))
     }
@@ -208,7 +219,7 @@ export default function SignIn() {
                 Create new account?{" "}
                 <Link
                   to="/sign-up"
-                  className="text-red-600 font-bold hover:underline"
+                  className="text-[#8fa31e] font-bold hover:underline"
                 >
                   Sign Up
                 </Link>

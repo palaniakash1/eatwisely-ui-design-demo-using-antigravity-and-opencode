@@ -227,14 +227,14 @@ export default function SignUp() {
             <OAuth />
           </form>
 
-          <div className="text-center pt-4">
-            <p className="text-gray-600 text-sm">
-              Already have an account?{" "}
-              <Link to="/sign-in" className="text-red-600 font-bold hover:underline">
-                Sign In
-              </Link>
-            </p>
-          </div>
+            <div className="text-center pt-4">
+              <p className="text-gray-600 text-sm">
+                Already have an account?{" "}
+                <Link to="/sign-in" className="text-[#8fa31e] font-bold hover:underline">
+                  Sign In
+                </Link>
+              </p>
+            </div>
           <div className="pb-6 mt-10 text-center">
             <p className="text-[10px] text-gray-400">© 2025 EatWisely</p>
           </div>

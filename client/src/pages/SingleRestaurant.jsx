@@ -179,7 +179,7 @@ export default function SingleRestaurant() {
                 {openingHoursList.map(({ day, hours }) => (
                   <div key={day} className="flex justify-between">
                     <span className="capitalize text-gray-600">{day}</span>
-                    <span className={hours === 'Closed' ? 'text-red-500' : 'text-gray-900'}>{hours}</span>
+                    <span className={hours === 'Closed' ? 'text-red-600' : 'text-gray-900'}>{hours}</span>
                   </div>
                 ))}
               </div>

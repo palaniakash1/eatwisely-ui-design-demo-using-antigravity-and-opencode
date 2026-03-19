@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { signOut } from '../redux/user/userSlice'
 import { logoutUser } from '../services/userApi'
+import { getDefaultRouteByRole } from '../utils/auth'
 import { Navbar, TextInput, Button, Dropdown, Avatar } from 'flowbite-react'
 import { HiSearch, HiLocationMarker, HiUser, HiCog, HiLogout, HiViewGrid } from 'react-icons/hi'
 
@@ -10,12 +11,12 @@ export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { currentUser } = useSelector((state) => state.user)
+  const { currentUser, userRole } = useSelector((state) => state.user)
   
   const [restaurantSearch, setRestaurantSearch] = useState('')
   const [locationSearch, setLocationSearch] = useState('')
 
-  const hideHeaderPaths = ['/sign-in', '/sign-up', '/dashboard']
+  const hideHeaderPaths = ['/sign-in', '/sign-up', '/user-dashboard', '/superadmin', '/admin', '/manager']
   const shouldHideHeader = hideHeaderPaths.some(path => location.pathname.startsWith(path))
 
   const handleSignOut = async () => {
@@ -107,7 +108,7 @@ export default function Header() {
                   <Link to="/profile" className="w-full">Profile</Link>
                 </Dropdown.Item>
                 <Dropdown.Item icon={HiViewGrid}>
-                  <Link to="/dashboard" className="w-full">Dashboard</Link>
+                  <Link to={getDefaultRouteByRole(userRole)} className="w-full">Dashboard</Link>
                 </Dropdown.Item>
                 <Dropdown.Item icon={HiCog}>
                   <Link to="/settings" className="w-full">Settings</Link>
