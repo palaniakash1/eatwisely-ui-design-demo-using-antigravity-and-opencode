@@ -13,8 +13,7 @@ const __dirname = path.dirname(__filename);
 
 class JWTKeyRotationService {
   constructor() {
-    this.keysDir =
-      config.jwtRotation.keysDir || path.join(__dirname, '../../keys');
+    this.keysDir = config.jwtRotation.keysDir || path.join(__dirname, '../../keys');
     this.currentKeyId = null;
     this.keyRotationInterval = config.jwtRotation.rotationIntervalMs;
     this.keyLifetime = config.jwtRotation.keyLifetimeMs;
@@ -228,11 +227,7 @@ class JWTKeyRotationService {
       ...restOptions
     } = options;
 
-    if (
-      !config.jwtRotation.enabled ||
-      !this.initialized ||
-      !this.currentKeyId
-    ) {
+    if (!config.jwtRotation.enabled || !this.initialized || !this.currentKeyId) {
       return jwt.sign(payload, fallbackSecret, {
         expiresIn,
         ...restOptions

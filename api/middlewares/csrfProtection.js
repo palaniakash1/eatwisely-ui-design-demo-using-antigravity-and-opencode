@@ -133,10 +133,7 @@ export const createCsrfMiddleware = (options = {}) => {
     // In production, you might want to require it
     if (!csrfToken) {
       // Log but don't block (API security handled by JWT)
-      logger.warn('csrf.token_missing_allowed', {
-        path: req.path,
-        method: req.method
-      });
+      logger.warn('csrf.token_missing_allowed', { path: req.path, method: req.method });
       return next();
     }
 

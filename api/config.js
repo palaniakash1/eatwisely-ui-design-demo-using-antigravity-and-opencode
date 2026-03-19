@@ -77,7 +77,8 @@ const config = {
     enabled: String(process.env.OTEL_ENABLED || 'true') !== 'false',
     serviceName:
       toOptionalString(process.env.OTEL_SERVICE_NAME) || 'mern-restaurant-api',
-    serviceVersion: toOptionalString(process.env.APP_VERSION) || '1.0.0',
+    serviceVersion:
+      toOptionalString(process.env.APP_VERSION) || '1.0.0',
     exporterUrl: toOptionalString(process.env.OTEL_EXPORTER_OTLP_ENDPOINT),
     jaegerEndpoint: toOptionalString(process.env.OTEL_EXPORTER_JAEGER_ENDPOINT)
   }

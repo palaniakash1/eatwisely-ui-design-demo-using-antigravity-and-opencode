@@ -15,7 +15,12 @@ const redactValue = (value) => {
     const redacted = {};
     for (const [key, val] of Object.entries(value)) {
       const lowerKey = key.toLowerCase();
-      if (lowerKey.includes('password') || lowerKey.includes('token') || lowerKey.includes('secret') || lowerKey.includes('key')) {
+      if (
+        lowerKey.includes('password') ||
+        lowerKey.includes('token') ||
+        lowerKey.includes('secret') ||
+        lowerKey.includes('key')
+      ) {
         redacted[key] = '[REDACTED]';
       } else {
         redacted[key] = redactValue(val);
@@ -84,5 +89,3 @@ export const createRequestLogger = (options = {}) => {
 };
 
 export default createRequestLogger;
-
-

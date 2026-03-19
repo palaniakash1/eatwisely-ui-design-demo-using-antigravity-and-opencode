@@ -15,46 +15,46 @@ const logDirectory = join(
 const buildTransportConfig = (production = isProd) =>
   production
     ? {
-        targets: [
-          {
-            target: 'pino/file',
-            options: {
-              destination: 1,
-              mkdir: true
-            },
-            level: 'info'
+      targets: [
+        {
+          target: 'pino/file',
+          options: {
+            destination: 1,
+            mkdir: true
           },
-          {
-            target: 'pino/file',
-            options: {
-              destination: join(logDirectory, 'error.log'),
-              mkdir: true
-            },
-            level: 'error'
+          level: 'info'
+        },
+        {
+          target: 'pino/file',
+          options: {
+            destination: join(logDirectory, 'error.log'),
+            mkdir: true
           },
-          {
-            target: 'pino/file',
-            options: {
-              destination: join(logDirectory, 'combined.log'),
-              mkdir: true
-            },
-            level: 'info'
-          }
-        ]
-      }
+          level: 'error'
+        },
+        {
+          target: 'pino/file',
+          options: {
+            destination: join(logDirectory, 'combined.log'),
+            mkdir: true
+          },
+          level: 'info'
+        }
+      ]
+    }
     : {
-        targets: [
-          {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              translateTime: 'SYS:standard',
-              ignore: 'pid,hostname'
-            },
-            level: 'debug'
-          }
-        ]
-      };
+      targets: [
+        {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'SYS:standard',
+            ignore: 'pid,hostname'
+          },
+          level: 'debug'
+        }
+      ]
+    };
 
 const buildPinoConfig = ({
   production = isProd,
