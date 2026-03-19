@@ -57,6 +57,9 @@ const config = {
   googleMapsApiKey: toOptionalString(process.env.GOOGLE_MAPS_API_KEY),
   emailServiceUrl: toOptionalString(process.env.EMAIL_SERVICE_URL),
   refreshTokenTtlDays: toPositiveInt(process.env.REFRESH_TOKEN_TTL_DAYS, 14),
+  csrf: {
+    ttlMs: toPositiveInt(process.env.CSRF_TOKEN_TTL_MS, 24 * 60 * 60 * 1000)
+  },
   loginLockout: {
     threshold: toPositiveInt(process.env.LOGIN_LOCKOUT_THRESHOLD, 5),
     baseMs: toPositiveInt(process.env.LOGIN_LOCKOUT_BASE_MS, 15 * 60 * 1000),
@@ -74,18 +77,20 @@ const config = {
     enabled: String(process.env.OTEL_ENABLED || 'true') !== 'false',
     serviceName:
       toOptionalString(process.env.OTEL_SERVICE_NAME) || 'mern-restaurant-api',
-    serviceVersion:
-      toOptionalString(process.env.APP_VERSION) || '1.0.0',
+    serviceVersion: toOptionalString(process.env.APP_VERSION) || '1.0.0',
     exporterUrl: toOptionalString(process.env.OTEL_EXPORTER_OTLP_ENDPOINT),
     jaegerEndpoint: toOptionalString(process.env.OTEL_EXPORTER_JAEGER_ENDPOINT)
-  },
-  healthCheck: {
-    includeMongo: String(process.env.HEALTH_CHECK_INCLUDE_MONGO || 'false') === 'true',
-    includeDeps: String(process.env.HEALTH_CHECK_INCLUDE_DEPS || 'false') === 'true'
   }
 };
 
 export const isProduction = config.env === 'production';
-export const isTest = config.env === 'test';
+const testEntryPath = String(process.argv[1] || '');
+const normalizedTestEntryPath = testEntryPath.replaceAll('\\', '/');
+export const isTest =
+  config.env === 'test' ||
+  process.argv.includes('--test') ||
+  process.env.NODE_ENV === 'test' ||
+  normalizedTestEntryPath.includes('/api/tests/') ||
+  testEntryPath.endsWith('.test.js');
 
 export default config;

@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { clearInterval, setInterval } from 'node:timers';
-import config from '../config.js';
+import config, { isTest } from '../config.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -13,7 +13,8 @@ const __dirname = path.dirname(__filename);
 
 class JWTKeyRotationService {
   constructor() {
-    this.keysDir = config.jwtRotation.keysDir || path.join(__dirname, '../../keys');
+    this.keysDir =
+      config.jwtRotation.keysDir || path.join(__dirname, '../../keys');
     this.currentKeyId = null;
     this.keyRotationInterval = config.jwtRotation.rotationIntervalMs;
     this.keyLifetime = config.jwtRotation.keyLifetimeMs;
@@ -28,7 +29,7 @@ class JWTKeyRotationService {
 
   async initialize() {
     try {
-      if (!config.jwtRotation.enabled || config.env === 'test') {
+      if (!config.jwtRotation.enabled || isTest) {
         return false;
       }
       await this.ensureKeysDirectory();
@@ -227,7 +228,11 @@ class JWTKeyRotationService {
       ...restOptions
     } = options;
 
-    if (!config.jwtRotation.enabled || !this.initialized || !this.currentKeyId) {
+    if (
+      !config.jwtRotation.enabled ||
+      !this.initialized ||
+      !this.currentKeyId
+    ) {
       return jwt.sign(payload, fallbackSecret, {
         expiresIn,
         ...restOptions
