@@ -518,34 +518,39 @@
  * 
  *     responses:
  *       200:
- *         description: Match found and linked
+ *         description: Auto-link result (success or multiple options)
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AutoLinkResponse'
- *             example:
- *               success: true
- *               linked: true
- *               matchScore: 0.92
- *               data:
- *                 fhrsId: 123456
- *                 rating: "5"
- * 
- *       200:
- *         description: Multiple matches found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/AutoLinkResponse'
- *             example:
- *               success: false
- *               linked: false
- *               message: "No matching FSA establishment found"
+ *             examples:
+ *               success:
+ *                 summary: Match found and linked
+ *                 value:
+ *                   success: true
+ *                   linked: true
+ *                   matchScore: 0.92
+ *                   data:
+ *                     fhrsId: 123456
+ *                     rating: "5"
+ *               noMatch:
+ *                 summary: No matching establishment found
+ *                 value:
+ *                   success: false
+ *                   linked: false
+ *                   message: "No matching FSA establishment found"
+ *                   data: null
  *               multipleOptions:
- *                 - fhrsId: 123456
- *                   name: "Similar Name Branch 1"
- *                 - fhrsId: 123457
- *                   name: "Similar Name Branch 2"
+ *                 summary: Multiple matches found
+ *                 value:
+ *                   success: false
+ *                   linked: false
+ *                   message: "Multiple potential matches found"
+ *                   multipleOptions:
+ *                     - fhrsId: 123456
+ *                       name: "Similar Name Branch 1"
+ *                     - fhrsId: 123457
+ *                       name: "Similar Name Branch 2"
  * 
  *       401:
  *         description: Authentication required

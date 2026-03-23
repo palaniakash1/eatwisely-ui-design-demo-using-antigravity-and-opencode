@@ -76,35 +76,21 @@ const extractBusinessType = (name) => {
 
 export const searchEstablishments = async (name, postcode = null) => {
   const queryParams = buildQueryString({ name, postcode });
-  const url = `${FSA_API_BASE_URL}/Establishments?${queryParams}`;
+  const url = `${FSA_API_BASE_URL}/Establishments?${queryParams}&pageSize=50`;
 
-  const response = await withRetry(
-    async () => {
-      const res = await axios.get(url, {
-        headers: {
-          'x-api-version': FSA_API_VERSION,
-          Accept: 'application/json'
-        }
-      });
-
-      return res.data;
-    },
-    {
-      maxAttempts: 3,
-      baseDelay: 500,
-      maxDelay: 5000,
-      onRetry: (error, attempt, max) => {
-        logger.warn('fsa_api.retry', {
-          url,
-          attempt,
-          max,
-          error: error.message
-        });
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        'x-api-version': FSA_API_VERSION,
+        Accept: 'application/json'
       }
-    }
-  );
+    });
 
-  return response;
+    return res.data;
+  } catch (error) {
+    logger.error('fsa_api.search_http_error', { url, error: error.message });
+    throw error;
+  }
 };
 
 export const getEstablishmentByFHRSID = async (fhrsId) => {
@@ -140,6 +126,17 @@ export const getEstablishmentByFHRSID = async (fhrsId) => {
     const establishment = response.FHRSAuthority.EstablishmentCollection.EstablishmentDetail;
     await setJson(cacheKey, establishment, CACHE_TTL_ESTABLISHMENT);
     return establishment;
+  }
+
+  if (response?.establishments?.[0]) {
+    const establishment = response.establishments[0];
+    await setJson(cacheKey, establishment, CACHE_TTL_ESTABLISHMENT);
+    return establishment;
+  }
+
+  if (response?.FHRSID) {
+    await setJson(cacheKey, response, CACHE_TTL_ESTABLISHMENT);
+    return response;
   }
 
   throw new Error('Invalid FSA API response format');
@@ -227,7 +224,11 @@ export const searchAndMatchEstablishment = async (name, postcode = null) => {
   try {
     const searchResponse = await searchEstablishments(name, postcode);
 
-    const establishments = searchResponse?.FHRSAuthority?.EstablishmentCollection?.EstablishmentDetail;
+    let establishments = searchResponse?.establishments;
+
+    if (!establishments) {
+      establishments = searchResponse?.FHRSAuthority?.EstablishmentCollection?.EstablishmentDetail;
+    }
 
     if (!establishments || (Array.isArray(establishments) && establishments.length === 0)) {
       return {
@@ -235,7 +236,8 @@ export const searchAndMatchEstablishment = async (name, postcode = null) => {
         matched: false,
         data: null,
         multipleOptions: null,
-        error: null
+        error: null,
+        rawResponse: searchResponse
       };
     }
 
