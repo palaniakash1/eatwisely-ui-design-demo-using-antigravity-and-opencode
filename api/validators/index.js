@@ -422,3 +422,19 @@ export const reviewValidators = {
     isActive: Joi.boolean().required()
   })
 };
+
+export const fsaValidators = {
+  searchQuery: Joi.object({
+    name: Joi.string().trim().min(2).required(),
+    postcode: Joi.string().trim().allow('')
+  }),
+  linkBody: Joi.object({
+    fhrsId: Joi.number().integer().positive().required()
+  }),
+  restaurantIdParam: Joi.object({
+    restaurantId: objectId.required()
+  }),
+  fhrsIdParam: Joi.object({
+    fhrsId: Joi.string().pattern(/^\d+$/).required()
+  })
+};
