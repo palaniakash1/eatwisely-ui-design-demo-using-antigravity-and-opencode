@@ -114,23 +114,28 @@ export const getEstablishmentByFHRSID = async (fhrsId) => {
       validateStatus: () => true
     });
   } catch (error) {
-    console.log('FSA_API_FETCH_ERROR:', fhrsId, error.message);
     logger.error('fsa_api.fetch_error', { fhrsId, error: error.message, stack: error.stack });
     throw new Error('Failed to connect to FSA API');
   }
 
-  console.log('FSA_API_RESPONSE:', fhrsId, response.status, JSON.stringify(response.data).substring(0, 100));
+  const data = response.data;
 
-  if (response.status === 404) {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Establishment not found');
+  }
+
+  if (data.Message && data.Message.toLowerCase().includes('not found')) {
+    throw new Error('Establishment not found');
+  }
+
+  if (response.status === 404 || response.status === 204 || response.status === 410 || response.status >= 400) {
     throw new Error('Establishment not found');
   }
 
   if (response.status !== 200) {
-    const errorMsg = response?.data?.Message || `FSA API returned status ${response.status}`;
+    const errorMsg = data?.Message || `FSA API returned status ${response.status}`;
     throw new Error(errorMsg);
   }
-
-  const data = response.data;
 
   if (data?.FHRSAuthority?.EstablishmentCollection?.EstablishmentDetail) {
     const establishment = data.FHRSAuthority.EstablishmentCollection.EstablishmentDetail;

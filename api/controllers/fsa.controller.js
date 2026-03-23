@@ -2,6 +2,7 @@ import Restaurant from '../models/restaurant.model.js';
 import {
   searchAndMatchEstablishment,
   getRatingByFHRSID,
+  getEstablishmentByFHRSID,
   generateBadgeUrl
 } from '../services/fsa.service.js';
 import { errorHandler } from '../utils/error.js';
@@ -87,9 +88,14 @@ export const getRating = async (req, res, next) => {
       });
     } catch (fsaError) {
       const errorMessage = (fsaError.message || '').toLowerCase();
-      if (errorMessage.includes('not found') || 
-          errorMessage.includes('no establishment') ||
-          errorMessage.includes('establishmentid')) {
+      const isNotFoundError = 
+        errorMessage.includes('not found') || 
+        errorMessage.includes('no establishment') ||
+        errorMessage.includes('establishmentid') ||
+        errorMessage.includes('fsa api returned status') ||
+        errorMessage.includes('failed to connect');
+      
+      if (isNotFoundError) {
         throw errorHandler(404, 'Establishment not found');
       }
       logger.error('fsa.get_rating.error', { fhrsId, error: fsaError.message });
