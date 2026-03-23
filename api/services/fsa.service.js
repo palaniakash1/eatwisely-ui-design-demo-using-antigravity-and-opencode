@@ -104,39 +104,49 @@ export const getEstablishmentByFHRSID = async (fhrsId) => {
 
   const url = `${FSA_API_BASE_URL}/Establishments/${fhrsId}`;
 
-  const response = await withRetry(
-    async () => {
-      const res = await axios.get(url, {
-        headers: {
-          'x-api-version': FSA_API_VERSION,
-          Accept: 'application/json'
-        }
-      });
+  let response;
+  try {
+    response = await axios.get(url, {
+      headers: {
+        'x-api-version': FSA_API_VERSION,
+        Accept: 'application/json'
+      },
+      validateStatus: () => true
+    });
+  } catch (error) {
+    console.log('FSA_API_FETCH_ERROR:', fhrsId, error.message);
+    logger.error('fsa_api.fetch_error', { fhrsId, error: error.message, stack: error.stack });
+    throw new Error('Failed to connect to FSA API');
+  }
 
-      return res.data;
-    },
-    {
-      maxAttempts: 3,
-      baseDelay: 500,
-      maxDelay: 5000
-    }
-  );
+  console.log('FSA_API_RESPONSE:', fhrsId, response.status, JSON.stringify(response.data).substring(0, 100));
 
-  if (response?.FHRSAuthority?.EstablishmentCollection?.EstablishmentDetail) {
-    const establishment = response.FHRSAuthority.EstablishmentCollection.EstablishmentDetail;
+  if (response.status === 404) {
+    throw new Error('Establishment not found');
+  }
+
+  if (response.status !== 200) {
+    const errorMsg = response?.data?.Message || `FSA API returned status ${response.status}`;
+    throw new Error(errorMsg);
+  }
+
+  const data = response.data;
+
+  if (data?.FHRSAuthority?.EstablishmentCollection?.EstablishmentDetail) {
+    const establishment = data.FHRSAuthority.EstablishmentCollection.EstablishmentDetail;
     await setJson(cacheKey, establishment, CACHE_TTL_ESTABLISHMENT);
     return establishment;
   }
 
-  if (response?.establishments?.[0]) {
-    const establishment = response.establishments[0];
+  if (data?.establishments?.[0]) {
+    const establishment = data.establishments[0];
     await setJson(cacheKey, establishment, CACHE_TTL_ESTABLISHMENT);
     return establishment;
   }
 
-  if (response?.FHRSID) {
-    await setJson(cacheKey, response, CACHE_TTL_ESTABLISHMENT);
-    return response;
+  if (data?.FHRSID) {
+    await setJson(cacheKey, data, CACHE_TTL_ESTABLISHMENT);
+    return data;
   }
 
   throw new Error('Invalid FSA API response format');

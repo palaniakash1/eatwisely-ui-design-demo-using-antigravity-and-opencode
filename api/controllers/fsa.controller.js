@@ -58,24 +58,43 @@ export const getRating = async (req, res, next) => {
       });
     }
 
-    const result = await getRatingByFHRSID(parseInt(fhrsId, 10));
+    try {
+      const establishment = await getEstablishmentByFHRSID(parseInt(fhrsId, 10));
+      
+      const responseData = {
+        fhrsId: establishment.FHRSID,
+        name: establishment.BusinessName,
+        address: {
+          line1: establishment.AddressLine1,
+          line2: establishment.AddressLine2,
+          line3: establishment.AddressLine3,
+          postcode: establishment.PostCode
+        },
+        rating: establishment.RatingValue,
+        ratingDate: establishment.RatingDate,
+        hygieneScore: establishment.Scores?.Hygiene,
+        structuralScore: establishment.Scores?.Structural,
+        confidenceInManagementScore: establishment.Scores?.ConfidenceInManagement,
+        badgeUrl: `https://ratings.food.gov.uk/images/badges/fhrs/3/fhrs-badge-${establishment.RatingValue}.svg`
+      };
 
-    if (!result.success) {
+      await setJson(cacheKey, responseData, FSA_RATING_CACHE_TTL);
+
+      return res.status(200).json({
+        success: true,
+        data: responseData,
+        cached: false
+      });
+    } catch (fsaError) {
+      const errorMessage = (fsaError.message || '').toLowerCase();
+      if (errorMessage.includes('not found') || 
+          errorMessage.includes('no establishment') ||
+          errorMessage.includes('establishmentid')) {
+        throw errorHandler(404, 'Establishment not found');
+      }
+      logger.error('fsa.get_rating.error', { fhrsId, error: fsaError.message });
       throw errorHandler(502, 'Failed to fetch rating from FSA API');
     }
-
-    const responseData = {
-      ...result.data,
-      badgeUrl: result.badgeUrl
-    };
-
-    await setJson(cacheKey, responseData, FSA_RATING_CACHE_TTL);
-
-    res.status(200).json({
-      success: true,
-      data: responseData,
-      cached: false
-    });
   } catch (error) {
     next(error);
   }

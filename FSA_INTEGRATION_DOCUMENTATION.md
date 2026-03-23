@@ -145,24 +145,26 @@ GET /api/fsa/search?name=<restaurant_name>&postcode=<optional_postcode>
 ```json
 {
   "success": true,
-  "matched": true,
   "data": {
-    "fhrsId": 123456,
-    "name": "Restaurant Name",
-    "address": {
-      "line1": "123 Street",
-      "line2": "Area",
-      "line3": "City",
-      "postcode": "AB12 3CD"
+    "matched": true,
+    "result": {
+      "fhrsId": 123456,
+      "name": "Restaurant Name",
+      "address": {
+        "line1": "123 Street",
+        "line2": "Area",
+        "line3": "City",
+        "postcode": "AB12 3CD"
+      },
+      "rating": "5",
+      "ratingDate": "2024-01-15",
+      "hygieneScore": 5,
+      "structuralScore": 5,
+      "confidenceInManagementScore": 5
     },
-    "rating": "5",
-    "ratingDate": "2024-01-15",
-    "hygieneScore": 5,
-    "structuralScore": 5,
-    "confidenceInManagementScore": 5
-  },
-  "multipleOptions": null,
-  "score": 0.95
+    "multipleOptions": null,
+    "score": 0.95
+  }
 }
 ```
 
@@ -170,13 +172,15 @@ GET /api/fsa/search?name=<restaurant_name>&postcode=<optional_postcode>
 ```json
 {
   "success": true,
-  "matched": true,
-  "data": { ... },
-  "multipleOptions": [
-    { "fhrsId": 123456, "name": "Main Branch", ... },
-    { "fhrsId": 123457, "name": "City Center", ... }
-  ],
-  "score": 0.85
+  "data": {
+    "matched": true,
+    "result": { ... },
+    "multipleOptions": [
+      { "fhrsId": 123456, "name": "Main Branch", ... },
+      { "fhrsId": 123457, "name": "City Center", ... }
+    ],
+    "score": 0.85
+  }
 }
 ```
 
@@ -184,11 +188,12 @@ GET /api/fsa/search?name=<restaurant_name>&postcode=<optional_postcode>
 ```json
 {
   "success": true,
-  "matched": false,
-  "data": null,
-  "multipleOptions": null,
-  "error": null,
-  "message": "No suitable match found"
+  "data": {
+    "matched": false,
+    "result": null,
+    "multipleOptions": null,
+    "message": "No suitable match found"
+  }
 }
 ```
 

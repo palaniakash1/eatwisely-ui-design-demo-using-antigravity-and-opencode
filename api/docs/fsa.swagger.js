@@ -212,16 +212,17 @@
  *               $ref: '#/components/schemas/FSASearchResponse'
  *             example:
  *               success: true
- *               matched: true
  *               data:
- *                 fhrsId: 123456
- *                 name: "Pizza Express"
- *                 address:
- *                   line1: "123 Oxford Street"
- *                   postcode: "W1D 3QW"
- *                 rating: "5"
- *               multipleOptions: null
- *               score: 0.92
+ *                 matched: true
+ *                 result:
+ *                   fhrsId: 123456
+ *                   name: "Pizza Express"
+ *                   address:
+ *                     line1: "123 Oxford Street"
+ *                     postcode: "W1D 3QW"
+ *                   rating: "5"
+ *                 multipleOptions: null
+ *                 score: 0.92
  * 
  *       400:
  *         description: Validation error - name too short or missing

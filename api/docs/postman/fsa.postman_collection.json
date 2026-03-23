@@ -93,9 +93,9 @@
                   "    pm.expect(jsonData).to.have.property('success', true);",
                   "});",
                   "",
-                  "pm.test('Response contains matched flag', function() {",
+                  "pm.test('Response contains matched flag in data', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('matched');",
+                  "    pm.expect(jsonData.data).to.have.property('matched');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -160,9 +160,9 @@
                   "    pm.expect(jsonData.data).to.have.property('rating');",
                   "});",
                   "",
-                  "pm.test('Response has badgeUrl', function() {",
+                  "pm.test('Response has badgeUrl in data', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('badgeUrl');",
+                  "    pm.expect(jsonData.data).to.have.property('badgeUrl');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -229,7 +229,7 @@
                   "",
                   "pm.test('Error message contains validation', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.error).to.include('at least 2 characters');",
+                  "    pm.expect(jsonData.message).to.include('minimum 2 characters');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -610,7 +610,7 @@
                   "",
                   "pm.test('Error about positive integer', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.error).to.include('positive');",
+                  "    pm.expect(jsonData.message).to.include('positive');",
                   "});"
                 ],
                 "type": "text/javascript"
