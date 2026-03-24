@@ -89,11 +89,13 @@ const restaurantCreateBody = Joi.object({
   isActive: Joi.boolean(),
   isFeatured: Joi.boolean(),
   isTrending: Joi.boolean(),
-  // Location at top level - controller uses lat/lng directly instead of geocoding
+  // Location at top level - accepts either lat/lng OR GeoJSON format
   location: Joi.object({
-    lat: Joi.number().required(),
-    lng: Joi.number().required()
-  })
+    lat: Joi.number(),
+    lng: Joi.number(),
+    type: Joi.string().valid('Point'),
+    coordinates: Joi.array().items(Joi.number()).length(2)
+  }).or('lat', 'coordinates')
 }).unknown(false);
 
 const restaurantUpdateBody = Joi.object({
