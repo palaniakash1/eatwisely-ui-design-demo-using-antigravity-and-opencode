@@ -1,6 +1,58 @@
 const API_URL = '/api';
 const AUTH_URL = '/api/auth';
 
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+const subscribeTokenRefresh = (cb) => {
+  refreshSubscribers.push(cb);
+};
+
+const onTokenRefreshed = () => {
+  refreshSubscribers.forEach((cb) => cb());
+  refreshSubscribers = [];
+};
+
+const refreshAuthToken = async () => {
+  if (isRefreshing) {
+    return new Promise((resolve) => {
+      subscribeTokenRefresh(() => resolve());
+    });
+  }
+
+  isRefreshing = true;
+  
+  try {
+    const res = await fetch(`${AUTH_URL}/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    
+    if (res.ok) {
+      isRefreshing = false;
+      onTokenRefreshed();
+      return true;
+    } else {
+      isRefreshing = false;
+      refreshSubscribers = [];
+      return false;
+    }
+  } catch (error) {
+    isRefreshing = false;
+    refreshSubscribers = [];
+    return false;
+  }
+};
+
+const redirectToSignIn = () => {
+  localStorage.removeItem('csrfToken');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  if (window.location.pathname !== '/signin') {
+    window.location.href = '/signin';
+  }
+};
+
 const getCsrfToken = () => {
   let token = localStorage.getItem('csrfToken');
   if (!token) {
@@ -40,7 +92,7 @@ export const refreshCsrfToken = async () => {
   return null;
 };
 
-const fetchWithAuth = async (url, options = {}) => {
+const fetchWithAuth = async (url, options = {}, retryCount = 0) => {
   const csrfToken = getCsrfToken();
   console.log('CSRF Token being sent:', csrfToken);
   const headers = {
@@ -61,16 +113,14 @@ const fetchWithAuth = async (url, options = {}) => {
   console.log('Response data:', data);
 
   if (!response.ok) {
-    if (data.message === 'Invalid CSRF token' || data.message?.includes('CSRF')) {
-      console.log('CSRF Error - trying to get fresh token...');
-      try {
-        await fetchWithAuth(`${AUTH_URL}/session`, { method: 'GET' });
-      } catch (e) {
-        console.error('Failed to refresh session:', e);
-      }
-      const newToken = getCsrfToken();
-      if (newToken) {
-        headers['x-csrf-token'] = newToken;
+    if (response.status === 401) {
+      console.log('Auth token expired - attempting refresh...');
+      const refreshed = await refreshAuthToken();
+      
+      if (refreshed) {
+        console.log('Token refreshed successfully, retrying request...');
+        const newCsrfToken = getCsrfToken();
+        headers['x-csrf-token'] = newCsrfToken;
         const retryResponse = await fetch(url, {
           ...options,
           headers,
@@ -78,7 +128,40 @@ const fetchWithAuth = async (url, options = {}) => {
         });
         const retryData = await retryResponse.json();
         if (retryResponse.ok) {
+          if (retryData.csrfToken) {
+            localStorage.setItem('csrfToken', retryData.csrfToken);
+          }
           return retryData;
+        }
+        if (retryResponse.status === 401) {
+          console.log('Refresh succeeded but request still failed with 401');
+          redirectToSignIn();
+          throw new Error('Session expired. Please sign in again.');
+        }
+      }
+      
+      console.log('Token refresh failed');
+      redirectToSignIn();
+      throw new Error(data.message || 'Session expired. Please sign in again.');
+    }
+
+    if (data.message === 'Invalid CSRF token' || data.message?.includes('CSRF')) {
+      console.log('CSRF Error - trying to get fresh token...');
+      const refreshed = await refreshAuthToken();
+      
+      if (refreshed) {
+        const newCsrfToken = getCsrfToken();
+        if (newCsrfToken) {
+          headers['x-csrf-token'] = newCsrfToken;
+          const retryResponse = await fetch(url, {
+            ...options,
+            headers,
+            credentials: 'include',
+          });
+          const retryData = await retryResponse.json();
+          if (retryResponse.ok) {
+            return retryData;
+          }
         }
       }
     }
