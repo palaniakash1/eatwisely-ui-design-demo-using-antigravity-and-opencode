@@ -77,10 +77,13 @@ export default function App() {
     restoreSession()
   }, [dispatch, currentUser])
 
+  const isAuthPage = location.pathname === '/sign-in' || location.pathname === '/sign-up'
+  
   const isDashboard = location.pathname.startsWith('/user-dashboard') || 
                       location.pathname.startsWith('/superadmin') ||
                       location.pathname.startsWith('/admin') ||
-                      location.pathname.startsWith('/manager')
+                      location.pathname.startsWith('/manager') ||
+                      isAuthPage
 
   return (
     <div className="flex flex-col min-h-screen">

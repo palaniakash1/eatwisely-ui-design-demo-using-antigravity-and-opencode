@@ -48,8 +48,8 @@ const redirectToSignIn = () => {
   localStorage.removeItem('csrfToken');
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  if (window.location.pathname !== '/signin') {
-    window.location.href = '/signin';
+  if (window.location.pathname !== '/sign-in') {
+    window.location.href = '/sign-in';
   }
 };
 
