@@ -296,7 +296,7 @@ export const categoryValidators = {
     isActive: Joi.boolean()
   }).min(1),
   updateStatusBody: Joi.object({
-    isActive: Joi.boolean().required()
+    status: Joi.string().valid('draft', 'blocked', 'published').required()
   }),
   bulkStatusBody: Joi.object({
     ids: Joi.array().items(objectId).min(1).required(),
@@ -351,8 +351,35 @@ export const menuValidators = {
         price: Joi.number().min(0).required()
       })
     ),
-    isMeal: Joi.boolean()
+    isMeal: Joi.boolean(),
+    order: Joi.number().integer().min(0),
+    isAvailable: Joi.boolean()
   }).unknown(false),
+  addItemsBody: Joi.object({
+    items: Joi.array().items(
+      Joi.object({
+        name: Joi.string().trim().min(1).required(),
+        description: Joi.string().allow(''),
+        image: Joi.string().uri().allow(''),
+        price: Joi.number().min(0).required(),
+        dietary: Joi.object({
+          vegetarian: Joi.boolean(),
+          vegan: Joi.boolean()
+        }),
+        ingredients: Joi.array().items(Joi.object().unknown(true)),
+        nutrition: Joi.object().unknown(true),
+        upsells: Joi.array().items(
+          Joi.object({
+            label: Joi.string().trim().required(),
+            price: Joi.number().min(0).required()
+          })
+        ),
+        isMeal: Joi.boolean(),
+        order: Joi.number().integer().min(0),
+        isAvailable: Joi.boolean()
+      })
+    ).min(1).required()
+  }),
   updateItemBody: Joi.object({
     name: Joi.string().trim().min(1),
     description: Joi.string().allow(''),

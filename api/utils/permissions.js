@@ -94,6 +94,7 @@ export const PERMISSIONS = {
     ],
     category: [
       'readMine',
+      'bulkStatus',
       'bulkReorder',
       'reorder',
       'checkSlug',
