@@ -1,6 +1,8 @@
 const API_URL = '/api';
 const AUTH_URL = '/api/auth';
 
+const getAuthToken = () => localStorage.getItem('token');
+
 let isRefreshing = false;
 let refreshSubscribers = [];
 
@@ -94,10 +96,12 @@ export const refreshCsrfToken = async () => {
 
 const fetchWithAuth = async (url, options = {}, retryCount = 0) => {
   const csrfToken = getCsrfToken();
+  const authToken = getAuthToken();
   console.log('CSRF Token being sent:', csrfToken);
   const headers = {
     'Content-Type': 'application/json',
     ...(csrfToken && { 'x-csrf-token': csrfToken }),
+    ...(authToken && { Authorization: `Bearer ${authToken}` }),
     ...options.headers,
   };
 
@@ -201,6 +205,7 @@ export const createUserInJson = async (userData) => {
 };
 
 export const logoutUser = async () => {
+  sessionStorage.setItem('isLoggingOut', 'true');
   try {
     await fetchWithAuth(`${AUTH_URL}/signout`, {
       method: 'POST',

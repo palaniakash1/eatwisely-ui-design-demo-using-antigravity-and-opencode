@@ -23,6 +23,7 @@ export default function Header() {
     try {
       await logoutUser()
       dispatch(signOut())
+      sessionStorage.removeItem('isLoggingOut')
       navigate('/')
     } catch (error) {
       console.log(error)

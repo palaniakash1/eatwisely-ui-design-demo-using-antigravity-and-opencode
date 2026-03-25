@@ -45,9 +45,31 @@ export default function App() {
   const dispatch = useDispatch()
   const [sessionRestored, setSessionRestored] = useState(false)
 
+  const isAuthPage = location.pathname === '/sign-in' || location.pathname === '/sign-up' || location.pathname === '/signin' || location.pathname === '/signup'
+
   useEffect(() => {
     const restoreSession = async () => {
       if (currentUser) {
+        setSessionRestored(true)
+        return
+      }
+
+      if (isAuthPage) {
+        setSessionRestored(true)
+        return
+      }
+
+      const hasToken = localStorage.getItem('token')
+      if (!hasToken) {
+        setSessionRestored(true)
+        return
+      }
+
+      const isLoggingOut = sessionStorage.getItem('isLoggingOut')
+      if (isLoggingOut === 'true') {
+        sessionStorage.removeItem('isLoggingOut')
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
         setSessionRestored(true)
         return
       }
@@ -75,10 +97,8 @@ export default function App() {
       setSessionRestored(true)
     }
     restoreSession()
-  }, [dispatch, currentUser])
+  }, [dispatch, currentUser, isAuthPage])
 
-  const isAuthPage = location.pathname === '/sign-in' || location.pathname === '/sign-up'
-  
   const isDashboard = location.pathname.startsWith('/user-dashboard') || 
                       location.pathname.startsWith('/superadmin') ||
                       location.pathname.startsWith('/admin') ||

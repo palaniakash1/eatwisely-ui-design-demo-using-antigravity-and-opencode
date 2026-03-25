@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { store } from '../redux/store';
+import { signOut } from '../redux/user/userSlice';
 
 const getAuthToken = () => localStorage.getItem('token');
 
@@ -32,9 +34,15 @@ const subscribeTokenRefresh = (cb) => {
   refreshSubscribers.push(cb);
 };
 
-const onTokenRefreshed = () => {
-  refreshSubscribers.forEach((cb) => cb());
+const onTokenRefreshed = (newToken) => {
+  refreshSubscribers.forEach((cb) => cb(newToken));
   refreshSubscribers = [];
+};
+
+const handleSignOut = () => {
+  store.dispatch(signOut());
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 };
 
 axiosInstance.interceptors.response.use(
@@ -49,29 +57,38 @@ axiosInstance.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          await axiosInstance.post('/auth/refresh', {}, { 
+          const res = await axiosInstance.post('/auth/refresh', {}, { 
             withCredentials: true 
           });
 
+          const newToken = res.data?.token;
+          if (newToken) {
+            localStorage.setItem('token', newToken);
+          }
+
           isRefreshing = false;
-          onTokenRefreshed();
+          onTokenRefreshed(newToken);
           return axiosInstance(originalRequest);
         } catch (refreshError) {
           isRefreshing = false;
           refreshSubscribers = [];
 
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          
-          if (window.location.pathname !== '/signin') {
-            window.location.href = '/signin';
+          const currentPath = window.location.pathname;
+          const isAuthPage = currentPath === '/signin' || currentPath === '/signup' || currentPath === '/sign-in' || currentPath === '/sign-up';
+
+          if (!isAuthPage) {
+            handleSignOut();
+            window.location.href = '/signin?expired=true';
           }
           return Promise.reject(refreshError);
         }
       }
 
-      return new Promise((resolve) => {
-        subscribeTokenRefresh(() => {
+      return new Promise((resolve, reject) => {
+        subscribeTokenRefresh((newToken) => {
+          if (newToken) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
           resolve(axiosInstance(originalRequest));
         });
       });

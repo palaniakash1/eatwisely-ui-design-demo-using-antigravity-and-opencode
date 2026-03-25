@@ -2,6 +2,7 @@ import imageCompression from 'browser-image-compression';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'flowbite-react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   getDownloadURL,
   getStorage,
@@ -30,6 +31,7 @@ export default function DashProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const toast = useToast();
+  const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadingProgress, setImageFileUploadingProgress] = useState(null);
@@ -179,6 +181,8 @@ export default function DashProfile() {
     try {
       await logoutUser();
       dispatch(signOutSuccess());
+      sessionStorage.removeItem('isLoggingOut');
+      navigate('/sign-in');
     } catch (error) {
       console.log(error);
     }

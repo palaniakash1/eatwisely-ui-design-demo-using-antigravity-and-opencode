@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { signOut } from '../../redux/user/userSlice'
+import { logoutUser } from '../../services/userApi'
 import { FaHome, FaStore, FaUsers, FaTags, FaList, FaStar, FaCog, FaScroll, FaSignOutAlt, FaBars, FaTimes, FaUser } from 'react-icons/fa'
 
 const menuItems = [
@@ -42,8 +43,14 @@ export default function AdminLayout() {
 
   const activeTab = getActiveTab()
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    try {
+      await logoutUser()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
     dispatch(signOut())
+    sessionStorage.removeItem('isLoggingOut')
     navigate('/sign-in')
   }
 

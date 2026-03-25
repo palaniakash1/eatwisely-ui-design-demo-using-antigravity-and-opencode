@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { HiHome, HiUser, HiCollection, HiMenuAlt2, HiStar, HiCog, HiLogout, HiUserCircle, HiDocumentText } from 'react-icons/hi'
 import { signOutSuccess } from '../redux/user/userSlice'
@@ -16,10 +16,13 @@ const navItems = [
 
 export default function DashSidebar({ isOpen, onClose }) {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleLogout = async () => {
     await logoutUser()
     dispatch(signOutSuccess())
+    sessionStorage.removeItem('isLoggingOut')
+    navigate('/sign-in')
   }
 
   return (
