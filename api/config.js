@@ -33,7 +33,7 @@ const config = {
   jwtExpire:
     toOptionalString(process.env.JWT_EXPIRE) ||
     toOptionalString(process.env.ACCESS_TOKEN_EXPIRE) ||
-    '8h',
+    '12h',
   jwtIssuer: toOptionalString(process.env.JWT_ISSUER) || 'mern-restaurant-api',
   jwtAudience:
     toOptionalString(process.env.JWT_AUDIENCE) || 'mern-restaurant-client',
