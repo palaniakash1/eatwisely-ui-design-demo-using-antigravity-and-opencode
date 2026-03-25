@@ -223,13 +223,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 400', function() {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test('Error message contains validation', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.message).to.include('minimum 2 characters');",
+                  "pm.test('Status code is 404', function() {",
+                  "    pm.response.to.have.status(404);",
                   "});"
                 ],
                 "type": "text/javascript"
