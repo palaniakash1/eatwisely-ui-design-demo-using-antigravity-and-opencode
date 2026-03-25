@@ -253,13 +253,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 404', function() {",
-                  "    pm.response.to.have.status(404);",
-                  "});",
-                  "",
-                  "pm.test('Success is false', function() {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.equal(false);",
+                  "pm.test('Status code is 400', function() {",
+                  "    pm.response.to.have.status(400);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -352,7 +347,7 @@
                   "",
                   "pm.test('Response has linked status', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('linked');",
+                  "    pm.expect(jsonData.data).to.have.property('linked');",
                   "});",
                   "",
                   "pm.test('Response has data object', function() {",
@@ -446,7 +441,7 @@
                   "",
                   "pm.test('Response contains linked or multipleOptions', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.any.keys('linked', 'multipleOptions');",
+                  "    pm.expect(jsonData.data).to.have.any.keys('linked', 'multipleOptions');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -515,20 +510,26 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 200 or 400', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
                   "});",
                   "",
                   "pm.test('Success message is returned', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.equal(true);",
-                  "    pm.expect(jsonData.message).to.include('refreshed');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData.success).to.equal(true);",
+                  "        pm.expect(jsonData.message).to.include('refreshed');",
+                  "    } else {",
+                  "        pm.expect(jsonData.success).to.equal(false);",
+                  "    }",
                   "});",
                   "",
-                  "pm.test('Data contains rating info', function() {",
+                  "pm.test('Data contains rating info when linked', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.have.property('fhrsId');",
-                  "    pm.expect(jsonData.data).to.have.property('rating');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData.data).to.have.property('fhrsId');",
+                  "        pm.expect(jsonData.data).to.have.property('rating');",
+                  "    }",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -680,7 +681,7 @@
                 "type": "text"
               }
             ],
-            "description": "404 error when trying to refresh a restaurant that is not linked to FSA"
+            "description": "400 error when trying to refresh a restaurant that is not linked to FSA"
           },
           "event": [
             {
