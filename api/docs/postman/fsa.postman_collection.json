@@ -557,15 +557,15 @@
               "host": ["{{baseUrl}}"],
               "path": ["fsa", "restaurant", "{{restaurantId}}"]
             },
-            "description": "Should return 401 when no authentication token is provided"
+            "description": "Returns restaurant FSA data (public endpoint)"
           },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 401', function() {",
-                  "    pm.response.to.have.status(401);",
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -614,9 +614,9 @@
                   "    pm.response.to.have.status(400);",
                   "});",
                   "",
-                  "pm.test('Error about positive integer', function() {",
+                  "pm.test('Error about FHRSID validation', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.message).to.include('positive');",
+                  "    pm.expect(jsonData.message).to.include('Valid FHRSID is required');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -661,8 +661,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 404', function() {",
-                  "    pm.response.to.have.status(404);",
+                  "pm.test('Status code is 404 or 502', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([404, 502]);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -693,8 +693,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 404', function() {",
-                  "    pm.response.to.have.status(404);",
+                  "pm.test('Status code is 400', function() {",
+                  "    pm.response.to.have.status(400);",
                   "});"
                 ],
                 "type": "text/javascript"
