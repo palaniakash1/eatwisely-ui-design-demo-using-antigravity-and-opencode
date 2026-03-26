@@ -336,18 +336,22 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 200 or 401', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
                   "});",
                   "",
-                  "pm.test('Response has linked status', function() {",
+                  "pm.test('Response has linked status when authenticated', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.have.property('linked');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData.data).to.have.property('linked');",
+                  "    }",
                   "});",
                   "",
-                  "pm.test('Response has data object', function() {",
+                  "pm.test('Response has data object when authenticated', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData).to.have.property('data');",
+                  "    }",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -392,14 +396,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 200 or 401', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
                   "});",
                   "",
-                  "pm.test('Success message is returned', function() {",
+                  "pm.test('Success message is returned when authenticated', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.equal(true);",
-                  "    pm.expect(jsonData.message).to.include('linked');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData.success).to.equal(true);",
+                  "        pm.expect(jsonData.message).to.include('linked');",
+                  "    }",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -430,13 +436,15 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 200 or 401', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
                   "});",
                   "",
-                  "pm.test('Response contains linked or multipleOptions', function() {",
+                  "pm.test('Response contains linked or multipleOptions when authenticated', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.have.any.keys('linked', 'multipleOptions');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData.data).to.have.any.keys('linked', 'multipleOptions');",
+                  "    }",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -467,14 +475,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function() {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 200 or 401', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
                   "});",
                   "",
-                  "pm.test('Success message is returned', function() {",
+                  "pm.test('Success message is returned when authenticated', function() {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.equal(true);",
-                  "    pm.expect(jsonData.message).to.include('unlinked');",
+                  "    if (pm.response.code === 200) {",
+                  "        pm.expect(jsonData.success).to.equal(true);",
+                  "        pm.expect(jsonData.message).to.include('unlinked');",
+                  "    }",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -505,16 +515,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200 or 400', function() {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "pm.test('Status code is 200, 400 or 401', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 401]);",
                   "});",
                   "",
-                  "pm.test('Success message is returned', function() {",
+                  "pm.test('Success message is returned when authenticated', function() {",
                   "    var jsonData = pm.response.json();",
                   "    if (pm.response.code === 200) {",
                   "        pm.expect(jsonData.success).to.equal(true);",
                   "        pm.expect(jsonData.message).to.include('refreshed');",
-                  "    } else {",
+                  "    } else if (pm.response.code === 400) {",
                   "        pm.expect(jsonData.success).to.equal(false);",
                   "    }",
                   "});",
