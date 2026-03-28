@@ -1,8 +1,33 @@
+/**
+ * =============================================================================
+ * AUTH UTILITIES - Role and Permission Helpers
+ * =============================================================================
+ * 
+ * This module provides utilities for handling user roles and permissions.
+ * 
+ * ROLE NAMING CONVENTION:
+ * - Backend stores: 'user', 'admin', 'superAdmin', 'storeManager' (camelCase)
+ * - Frontend constants: 'user', 'admin', 'superAdmin', 'storeManager' (camelCase)
+ * - We NORMALIZE all incoming roles to match these conventions
+ * 
+ * SECURITY: Role checks are case-insensitive to handle variations from different sources
+ */
+
 export const ROLES = {
   SUPERADMIN: 'superAdmin',
   ADMIN: 'admin',
   STORE_MANAGER: 'storeManager',
   USER: 'user',
+};
+
+// Backend might return lowercase, this maps to our camelCase format
+const ROLE_MAPPING = {
+  'superadmin': 'superAdmin',
+  'super_admin': 'superAdmin',
+  'admin': 'admin',
+  'storemanager': 'storeManager',
+  'store_manager': 'storeManager',
+  'user': 'user',
 };
 
 export const ROLE_LABELS = {
@@ -112,8 +137,5 @@ export const getDefaultRouteByRole = (role) => {
 export const normalizeRole = (role) => {
   if (!role) return ROLES.USER;
   const normalizedRole = role.toLowerCase();
-  if (normalizedRole === 'superadmin' || normalizedRole === 'superadmin') return ROLES.SUPERADMIN;
-  if (normalizedRole === 'admin') return ROLES.ADMIN;
-  if (normalizedRole === 'storemanager' || normalizedRole === 'store_manager') return ROLES.STORE_MANAGER;
-  return ROLES.USER;
+  return ROLE_MAPPING[normalizedRole] || ROLES.USER;
 };
