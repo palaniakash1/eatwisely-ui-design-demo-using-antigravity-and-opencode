@@ -1,16 +1,15 @@
 node_modules
-
 .env
-
 nul
-
 .env.production
-
 # JWT Keys - DO NOT COMMIT
 keys/
 *.key
-
+/keys/
+/keys
 # Also add these common ones
 *.log
 npm-debug.log*
 .DS_Store
+# JWT Keys - NEVER COMMIT
+keys/
