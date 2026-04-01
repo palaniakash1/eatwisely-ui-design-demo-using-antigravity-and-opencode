@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FaPlus, FaSearch, FaChevronDown, FaChevronLeft, FaChevronRight, FaFilter } from 'react-icons/fa'
+import { FaPlus, FaSearch, FaChevronDown, FaChevronLeft, FaChevronRight, FaFilter, FaSync } from 'react-icons/fa'
 
 export function DashboardLayout({ children }) {
   return (
@@ -9,9 +9,18 @@ export function DashboardLayout({ children }) {
   )
 }
 
-export function DashboardHeader({ title, onAddClick, searchValue, onSearchChange, filterOptions, onFilterChange, totalItems, currentPage, itemsPerPage, onPageChange }) {
+export function DashboardHeader({ title, onAddClick, searchValue, onSearchChange, filterOptions, onFilterChange, totalItems, currentPage, itemsPerPage, onPageChange, onRefresh, refreshInterval, onRefreshIntervalChange }) {
   const [showFilter, setShowFilter] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+  const handleRefresh = async () => {
+    if (onRefresh) {
+      setIsRefreshing(true)
+      await onRefresh()
+      setIsRefreshing(false)
+    }
+  }
 
   return (
     <div className="bg-white border-b border-gray-200 p-4">
@@ -45,7 +54,7 @@ export function DashboardHeader({ title, onAddClick, searchValue, onSearchChange
           {title}
         </h1>
 
-        {/* Right: Filter + Pagination */}
+        {/* Right: Filter + Refresh + Pagination */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
           {filterOptions && filterOptions.length > 0 && (
             <div className="relative">
@@ -74,6 +83,33 @@ export function DashboardHeader({ title, onAddClick, searchValue, onSearchChange
                     </label>
                   ))}
                 </div>
+              )}
+            </div>
+          )}
+
+          {onRefresh && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                title="Refresh"
+              >
+                <FaSync className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </button>
+              {onRefreshIntervalChange && (
+                <select
+                  value={refreshInterval}
+                  onChange={(e) => onRefreshIntervalChange(Number(e.target.value))}
+                  className="px-2 py-1 border border-gray-300 rounded-lg text-xs"
+                  title="Auto-refresh interval"
+                >
+                  <option value={0}>Off</option>
+                  <option value={10000}>10s</option>
+                  <option value={30000}>30s</option>
+                  <option value={60000}>1m</option>
+                  <option value={300000}>5m</option>
+                </select>
               )}
             </div>
           )}
@@ -125,7 +161,7 @@ export function DashboardHeader({ title, onAddClick, searchValue, onSearchChange
 
 export function DashboardContent({ children }) {
   return (
-    <div className="flex-1 overflow-auto p-4 lg:p-6">
+    <div className="flex-1 overflow-auto">
       {children}
     </div>
   )
