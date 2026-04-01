@@ -171,6 +171,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (initialized) return;
 
+    const isAuthPage = ['/sign-in', '/sign-up', '/forgot-password', '/reset-password'].some(
+      path => window.location.pathname.startsWith(path)
+    );
+
+    if (isAuthPage) {
+      dispatch({ type: ACTIONS.INIT, payload: null });
+      setInitialized(true);
+      return;
+    }
+
     validateSession()
       .then((sessionData) => {
         if (sessionData) {
