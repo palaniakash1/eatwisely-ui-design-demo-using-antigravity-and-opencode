@@ -2,20 +2,18 @@ import React from 'react';
 import { Button } from 'flowbite-react';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from 'firebase/auth';
 import { app } from '../firebase';
-import { useDispatch } from 'react-redux';
-import { signInSuccess } from '../redux/user/userSlice';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getDefaultRouteByRole } from '../utils/auth';
 import { AiFillGoogleCircle } from 'react-icons/ai';
 
 export default function OAuth() {
   const auth = getAuth(app);
-  const dispatch = useDispatch();
+  const { loginWithGoogle, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isSignup = location.pathname.includes('sign-up');
 
-  const [loading, setLoading] = React.useState(false);
   const preloadImage = (src) => {
     if (!src) return Promise.resolve();
     return new Promise((resolve, reject) => {
@@ -31,44 +29,26 @@ export default function OAuth() {
     provider.setCustomParameters({
       prompt: 'select_account'
     });
-    if (loading) return;
-    setLoading(true);
+    if (isLoading) return;
+    
     try {
       const resultFromGoogle = await signInWithPopup(auth, provider);
 
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name: resultFromGoogle.user.displayName,
-          email: resultFromGoogle.user.email,
-          googlePhotoUrl: resultFromGoogle.user.photoURL
-        }),
-        credentials: 'include'
+      const result = await loginWithGoogle({
+        name: resultFromGoogle.user.displayName,
+        email: resultFromGoogle.user.email,
+        googlePhotoUrl: resultFromGoogle.user.photoURL
       });
-      const data = await res.json();
-      if (res.ok) {
-        await preloadImage(data.profilePicture);
+
+      if (result.success) {
+        await preloadImage(result.user.profilePicture);
         
-        const userRole = data.role || data.userRole || 'user';
-        
-        dispatch(signInSuccess({
-          user: data,
-          role: userRole,
-          token: data.token || null
-        }));
-        
+        const userRole = result.user.role || result.user.userRole || 'user';
         const redirectPath = getDefaultRouteByRole(userRole);
         navigate(redirectPath);
-      } else {
-        console.error('OAuth sign-in failed:', data);
       }
     } catch (error) {
-      if (!res.ok) {
-        throw new Error(data.message || 'OAuth failed');
-      }
-    } finally {
-      setLoading(false);
+      console.error('OAuth sign-in failed:', error);
     }
   };
 
@@ -78,10 +58,10 @@ export default function OAuth() {
       outline
       className=" uppercase !bg-[#8fa31e] hover:!bg-[#7a8c1a] text-white !rounded-lg border-none"
       onClick={handleGoogleClick}
-      disabled={loading}
+      disabled={isLoading}
     >
       <AiFillGoogleCircle className="w-6 h-6 mr-2" />
-      {loading
+      {isLoading
         ? 'Please wait...'
         : isSignup
           ? 'Signup with Google'
