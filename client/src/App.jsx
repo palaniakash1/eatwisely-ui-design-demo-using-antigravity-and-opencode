@@ -1,6 +1,5 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { useEffect, useState } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Home from './pages/Home'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
@@ -37,67 +36,18 @@ import AdminReviews from './pages/admin/Reviews'
 import ManagerCategories from './pages/manager/Categories'
 import ManagerReviews from './pages/manager/Reviews'
 import { ROLES } from './utils/auth'
-import { signInSuccess } from './redux/user/userSlice'
 
 export default function App() {
-  const { currentUser, userRole } = useSelector((state) => state.user)
   const location = useLocation()
-  const dispatch = useDispatch()
-  const [sessionRestored, setSessionRestored] = useState(false)
 
   const isAuthPage = location.pathname === '/sign-in' || location.pathname === '/sign-up' || location.pathname === '/signin' || location.pathname === '/signup'
 
   useEffect(() => {
-    const restoreSession = async () => {
-      if (currentUser) {
-        setSessionRestored(true)
-        return
-      }
-
-      if (isAuthPage) {
-        setSessionRestored(true)
-        return
-      }
-
-      const hasToken = localStorage.getItem('token')
-      if (!hasToken) {
-        setSessionRestored(true)
-        return
-      }
-
-      const isLoggingOut = sessionStorage.getItem('isLoggingOut')
-      if (isLoggingOut === 'true') {
-        sessionStorage.removeItem('isLoggingOut')
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        setSessionRestored(true)
-        return
-      }
-      
-      try {
-        const response = await fetch('/api/auth/session', {
-          method: 'GET',
-          credentials: 'include',
-        })
-        if (response.ok) {
-          const data = await response.json()
-          
-          if (data.success && data.data) {
-            const user = data.data
-            dispatch(signInSuccess({
-              user: user,
-              role: user.role || 'user',
-              token: null
-            }))
-          }
-        }
-      } catch (error) {
-        console.log('Session restoration failed:', error)
-      }
-      setSessionRestored(true)
+    const isLoggingOut = sessionStorage.getItem('isLoggingOut')
+    if (isLoggingOut === 'true') {
+      sessionStorage.removeItem('isLoggingOut')
     }
-    restoreSession()
-  }, [dispatch, currentUser, isAuthPage])
+  }, [])
 
   const isDashboard = location.pathname.startsWith('/user-dashboard') || 
                       location.pathname.startsWith('/superadmin') ||

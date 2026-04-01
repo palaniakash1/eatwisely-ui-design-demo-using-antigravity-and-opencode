@@ -5,6 +5,7 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { BrowserRouter } from 'react-router-dom'
 import { store, persistor } from './redux/store'
 import { ToastProvider } from './components/Toast'
+import { AuthProvider } from './context/AuthContext'
 import App from './App.jsx'
 import './index.css'
 
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')).render(
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <ToastProvider>
-            <App />
+            <AuthProvider>
+              <App />
+            </AuthProvider>
           </ToastProvider>
         </BrowserRouter>
       </PersistGate>
