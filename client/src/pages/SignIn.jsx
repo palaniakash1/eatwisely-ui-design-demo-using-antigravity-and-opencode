@@ -1,15 +1,8 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import {
-  signInStart,
-  signInSuccess,
-  signInFailure,
-  clearError,
-} from "../redux/user/userSlice"
-import { useDispatch, useSelector } from "react-redux"
 import OAuth from "../components/OAuth"
 import { useToast } from "../components/Toast"
-import { validateUserCredentials } from "../services/userApi"
+import { useAuth } from "../context/AuthContext"
 import { getDefaultRouteByRole } from "../utils/auth"
 
 const EyeIcon = (props) => (
@@ -52,8 +45,7 @@ const EyeOffIcon = (props) => (
 
 export default function SignIn() {
   const [formData, setFormData] = useState({})
-  const { loading, error } = useSelector((state) => state.user)
-  const dispatch = useDispatch()
+  const { isLoading, error, login, clearError } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
   const [localError, setLocalError] = useState(null)
@@ -73,19 +65,12 @@ export default function SignIn() {
   useEffect(() => {
     if (error) {
       toast.error(error)
-      dispatch(clearError())
+      clearError()
     }
-  }, [error, dispatch, toast])
-
-  useEffect(() => {
-    if (localError) {
-      toast.error(localError)
-      setLocalError(null)
-    }
-  }, [localError, toast])
+  }, [error, clearError, toast])
 
   const handleChange = (e) => {
-    if (error) dispatch(clearError())
+    if (error) clearError()
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -99,35 +84,27 @@ export default function SignIn() {
     e.preventDefault()
 
     if (!formData.email || !formData.password) {
-      dispatch(signInFailure("Please fill in all fields"))
+      setLocalError("Please fill in all fields")
       return
     }
     try {
-      dispatch(signInStart())
+      const result = await login(formData.email, formData.password)
       
-      const { user } = await validateUserCredentials(formData.email, formData.password)
-      
-      if (!user) {
-        dispatch(signInFailure("Invalid email or password"))
+      if (!result.success) {
         return
       }
 
+      const { user } = result
       await preloadImage(user.profilePicture);
       
       const userRole = user.role || user.userRole || 'user';
-      
-      dispatch(signInSuccess({
-        user,
-        role: userRole,
-        token: user.token || localStorage.getItem('token')
-      }))
       
       toast.success("Login successful!")
       
       const redirectPath = getDefaultRouteByRole(userRole);
       navigate(redirectPath)
     } catch (error) {
-      dispatch(signInFailure(error.message))
+      setLocalError(error.message)
     }
   }
 
@@ -204,12 +181,18 @@ export default function SignIn() {
                   </button>
                 </div>
               </div>
+
+              {(error || localError) && (
+                <div className="text-red-500 text-sm text-center">
+                  {error || localError}
+                </div>
+              )}
               
               <button
-                disabled={loading}
+                disabled={isLoading}
                 className="p-2 rounded-md bg-[#8fa31e] hover:bg-[#7a8c1a] text-white border-none"
               >
-                {loading ? "Logging in..." : "Login"}
+                {isLoading ? "Logging in..." : "Login"}
               </button>
               <OAuth />
             </form>

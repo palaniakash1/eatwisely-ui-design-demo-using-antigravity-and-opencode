@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { useDispatch, useSelector } from "react-redux"
-import {
-  signInStart,
-  signInSuccess,
-  signInFailure,
-  clearError,
-} from "../redux/user/userSlice"
 import { useToast } from "../components/Toast"
-import { signup as apiSignup } from "../services/api"
+import { useAuth } from "../context/AuthContext"
 import OAuth from "../components/OAuth"
 import wavepattern from "../assets/wavepattern.png"
 import logo from "../assets/eatwisely.ico"
@@ -53,8 +46,7 @@ const EyeOffIcon = (props) => (
 
 export default function SignUp() {
   const [formData, setFormData] = useState({})
-  const { loading, error } = useSelector((state) => state.user)
-  const dispatch = useDispatch()
+  const { isLoading, error, register, clearError } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
   const [showPassword, setShowPassword] = useState(false)
@@ -62,12 +54,12 @@ export default function SignUp() {
   useEffect(() => {
     if (error) {
       toast.error(error)
-      dispatch(clearError())
+      clearError()
     }
-  }, [error, toast, dispatch])
+  }, [error, toast, clearError])
 
   const handleChange = (e) => {
-    if (error) dispatch(clearError())
+    if (error) clearError()
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -78,23 +70,24 @@ export default function SignUp() {
     e.preventDefault()
 
     if (!formData.userName || !formData.email || !formData.password) {
-      dispatch(signInFailure("Please fill in all fields"))
+      toast.error("Please fill in all fields")
       return
     }
 
     if (formData.password.length < 8) {
-      dispatch(signInFailure("Password must be at least 8 characters"))
+      toast.error("Password must be at least 8 characters")
       return
     }
 
     try {
-      dispatch(signInStart())
+      const result = await register(formData)
       
-      await apiSignup(formData)
-      toast.success("Account created! Please sign in.")
-      navigate("/sign-in")
+      if (result.success) {
+        toast.success("Account created! Please sign in.")
+        navigate("/sign-in")
+      }
     } catch (error) {
-      dispatch(signInFailure(error.message))
+      toast.error(error.message)
     }
   }
 
@@ -209,10 +202,10 @@ export default function SignUp() {
             </div>
 
             <button
-              disabled={loading}
+              disabled={isLoading}
               className="p-2 rounded-[5px] !bg-[#8fa31e] hover:!bg-[#7a8c1a] text-white !rounded-[4px] border-none"
             >
-              {loading ? "Creating account..." : "Sign Up"}
+              {isLoading ? "Creating account..." : "Sign Up"}
             </button>
 
             <div className="relative">
