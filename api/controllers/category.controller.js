@@ -588,7 +588,10 @@ export const bulkReorderCategories = async (req, res, next) => {
           idempotentReplay: true
         });
       }
-      throw errorHandler(409, 'Request with this idempotency key is in progress');
+      throw errorHandler(
+        409,
+        'Request with this idempotency key is in progress'
+      );
     }
 
     const result = await withTransaction(async (session) => {
@@ -1225,12 +1228,18 @@ export const updateCategoryStatus = async (req, res, next) => {
       const { status } = req.body;
 
       if (!status) {
-        throw errorHandler(400, 'status is required (draft, published, or blocked)');
+        throw errorHandler(
+          400,
+          'status is required (draft, published, or blocked)'
+        );
       }
 
       const allowedStatuses = ['draft', 'blocked', 'published'];
       if (!allowedStatuses.includes(status)) {
-        throw errorHandler(400, 'Invalid status value. Must be draft, published, or blocked');
+        throw errorHandler(
+          400,
+          'Invalid status value. Must be draft, published, or blocked'
+        );
       }
 
       const category = await Category.findById(req.params.id).session(session);
@@ -1240,7 +1249,10 @@ export const updateCategoryStatus = async (req, res, next) => {
 
       // Generic → only superAdmin
       if (category.isGeneric && req.user.role !== 'superAdmin') {
-        throw errorHandler(403, 'Only superAdmin can modify generic categories');
+        throw errorHandler(
+          403,
+          'Only superAdmin can modify generic categories'
+        );
       }
 
       // Restaurant category → admin must own it
@@ -1249,7 +1261,10 @@ export const updateCategoryStatus = async (req, res, next) => {
         req.user.role === 'admin' &&
         toIdString(category.restaurantId) !== toIdString(req.user.restaurantId)
       ) {
-        throw errorHandler(403, 'Not allowed - category does not belong to your restaurant');
+        throw errorHandler(
+          403,
+          'Not allowed - category does not belong to your restaurant'
+        );
       }
 
       const before = { status: category.status };
@@ -1468,21 +1483,27 @@ export const bulkUpdateCategoryStatus = async (req, res, next) => {
 
       // Build filter based on role
       const filter = { _id: { $in: uniqueIds } };
-      
+
       // Admin can only update their own restaurant's categories
       if (req.user.role === 'admin') {
-        const categories = await Category.find({ _id: { $in: uniqueIds } }).lean();
-        
+        const categories = await Category.find({
+          _id: { $in: uniqueIds }
+        }).lean();
+
         // Check ownership - admin can only update categories that belong to their restaurant
         const adminRestaurantId = req.user.restaurantId?.toString();
-        const unauthorizedCategories = categories.filter(c => 
-          !c.isGeneric && c.restaurantId?.toString() !== adminRestaurantId
+        const unauthorizedCategories = categories.filter(
+          (c) =>
+            !c.isGeneric && c.restaurantId?.toString() !== adminRestaurantId
         );
-        
+
         if (unauthorizedCategories.length > 0) {
-          throw errorHandler(403, 'You can only update categories for your own restaurant');
+          throw errorHandler(
+            403,
+            'You can only update categories for your own restaurant'
+          );
         }
-        
+
         // Include non-generic categories from admin's restaurant
         filter.$or = [
           { isGeneric: true },

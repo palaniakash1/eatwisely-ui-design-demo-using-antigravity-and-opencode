@@ -161,11 +161,11 @@ export const addMenuItems = async (req, res, next) => {
 
       // Handle both single item and array of items
       const itemsToAdd = Array.isArray(body.items) ? body.items : [body];
-      
+
       if (!itemsToAdd.length) {
         throw errorHandler(400, 'At least one item is required');
       }
-      
+
       // Validate each item has required fields
       for (const item of itemsToAdd) {
         if (!item?.name || typeof item?.price !== 'number' || item.price < 0) {

@@ -16,13 +16,20 @@ export const searchFSA = async (req, res, next) => {
     const { name, postcode } = req.query;
 
     if (!name || name.trim().length < 2) {
-      throw errorHandler(400, 'Restaurant name is required (minimum 2 characters)');
+      throw errorHandler(
+        400,
+        'Restaurant name is required (minimum 2 characters)'
+      );
     }
 
     const result = await searchAndMatchEstablishment(name, postcode || null);
 
     if (!result.success) {
-      logger.warn('fsa.search.api_error', { name, postcode, error: result.error });
+      logger.warn('fsa.search.api_error', {
+        name,
+        postcode,
+        error: result.error
+      });
     }
 
     res.status(200).json({
@@ -60,8 +67,10 @@ export const getRating = async (req, res, next) => {
     }
 
     try {
-      const establishment = await getEstablishmentByFHRSID(parseInt(fhrsId, 10));
-      
+      const establishment = await getEstablishmentByFHRSID(
+        parseInt(fhrsId, 10)
+      );
+
       const responseData = {
         fhrsId: establishment.FHRSID,
         name: establishment.BusinessName,
@@ -75,7 +84,8 @@ export const getRating = async (req, res, next) => {
         ratingDate: establishment.RatingDate,
         hygieneScore: establishment.Scores?.Hygiene,
         structuralScore: establishment.Scores?.Structural,
-        confidenceInManagementScore: establishment.Scores?.ConfidenceInManagement,
+        confidenceInManagementScore:
+          establishment.Scores?.ConfidenceInManagement,
         badgeUrl: `https://ratings.food.gov.uk/images/badges/fhrs/3/fhrs-badge-${establishment.RatingValue}.svg`
       };
 
@@ -88,13 +98,13 @@ export const getRating = async (req, res, next) => {
       });
     } catch (fsaError) {
       const errorMessage = (fsaError.message || '').toLowerCase();
-      const isNotFoundError = 
-        errorMessage.includes('not found') || 
+      const isNotFoundError =
+        errorMessage.includes('not found') ||
         errorMessage.includes('no establishment') ||
         errorMessage.includes('establishmentid') ||
         errorMessage.includes('fsa api returned status') ||
         errorMessage.includes('failed to connect');
-      
+
       if (isNotFoundError) {
         throw errorHandler(404, 'Establishment not found');
       }
@@ -120,8 +130,14 @@ export const linkRestaurant = async (req, res, next) => {
       throw errorHandler(404, 'Restaurant not found');
     }
 
-    if (restaurant.adminId.toString() !== req.user.id && req.user.role !== 'superAdmin') {
-      throw errorHandler(403, 'You do not have permission to update this restaurant');
+    if (
+      restaurant.adminId.toString() !== req.user.id &&
+      req.user.role !== 'superAdmin'
+    ) {
+      throw errorHandler(
+        403,
+        'You do not have permission to update this restaurant'
+      );
     }
 
     const result = await getRatingByFHRSID(parseInt(fhrsId, 10));
@@ -168,8 +184,14 @@ export const unlinkRestaurant = async (req, res, next) => {
       throw errorHandler(404, 'Restaurant not found');
     }
 
-    if (restaurant.adminId.toString() !== req.user.id && req.user.role !== 'superAdmin') {
-      throw errorHandler(403, 'You do not have permission to update this restaurant');
+    if (
+      restaurant.adminId.toString() !== req.user.id &&
+      req.user.role !== 'superAdmin'
+    ) {
+      throw errorHandler(
+        403,
+        'You do not have permission to update this restaurant'
+      );
     }
 
     restaurant.fhrsId = null;
@@ -207,8 +229,14 @@ export const refreshRestaurantRating = async (req, res, next) => {
       throw errorHandler(400, 'Restaurant is not linked to FSA rating');
     }
 
-    if (restaurant.adminId.toString() !== req.user.id && req.user.role !== 'superAdmin') {
-      throw errorHandler(403, 'You do not have permission to update this restaurant');
+    if (
+      restaurant.adminId.toString() !== req.user.id &&
+      req.user.role !== 'superAdmin'
+    ) {
+      throw errorHandler(
+        403,
+        'You do not have permission to update this restaurant'
+      );
     }
 
     const result = await getRatingByFHRSID(restaurant.fhrsId);
@@ -243,7 +271,9 @@ export const getRestaurantRating = async (req, res, next) => {
   try {
     const { restaurantId } = req.params;
 
-    const restaurant = await Restaurant.findById(restaurantId).select('fhrsId fsaRating name address');
+    const restaurant = await Restaurant.findById(restaurantId).select(
+      'fhrsId fsaRating name address'
+    );
     if (!restaurant) {
       throw errorHandler(404, 'Restaurant not found');
     }
@@ -280,7 +310,8 @@ export const getRestaurantRating = async (req, res, next) => {
 
 const shouldRefreshRating = (lastRefreshed) => {
   if (!lastRefreshed) return true;
-  const daysSinceRefresh = (Date.now() - new Date(lastRefreshed).getTime()) / (1000 * 60 * 60 * 24);
+  const daysSinceRefresh =
+    (Date.now() - new Date(lastRefreshed).getTime()) / (1000 * 60 * 60 * 24);
   return daysSinceRefresh > 7;
 };
 
@@ -293,8 +324,14 @@ export const autoLinkRestaurant = async (req, res, next) => {
       throw errorHandler(404, 'Restaurant not found');
     }
 
-    if (restaurant.adminId.toString() !== req.user.id && req.user.role !== 'superAdmin') {
-      throw errorHandler(403, 'You do not have permission to update this restaurant');
+    if (
+      restaurant.adminId.toString() !== req.user.id &&
+      req.user.role !== 'superAdmin'
+    ) {
+      throw errorHandler(
+        403,
+        'You do not have permission to update this restaurant'
+      );
     }
 
     const result = await searchAndMatchEstablishment(
@@ -326,7 +363,8 @@ export const autoLinkRestaurant = async (req, res, next) => {
             postcode: est.PostCode,
             rating: est.RatingValue
           })),
-          message: 'Multiple matches found. Please select the correct establishment.'
+          message:
+            'Multiple matches found. Please select the correct establishment.'
         }
       });
     }
