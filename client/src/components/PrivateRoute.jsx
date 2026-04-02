@@ -1,50 +1,27 @@
-import { useSelector, useDispatch } from 'react-redux'
+/**
+ * =============================================================================
+ * PRIVATE ROUTE - Route Guard for Authenticated Users
+ * =============================================================================
+ * 
+ * This component wraps protected routes and ensures:
+ * 1. User is authenticated
+ * 2. Session is still valid
+ * 3. Redirects to sign-in if not authenticated
+ * 
+ * How it works:
+ * 1. Check if user is authenticated from AuthContext
+ * 2. If not initialized yet, show loading spinner
+ * 3. If not authenticated, redirect to sign-in
+ * 4. If authenticated, render the children (protected content)
+ */
+
 import { Navigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import axios from '../services/axios'
-import { signOut } from '../redux/user/userSlice'
+import { useAuth } from '../context/AuthContext'
 
 export default function PrivateRoute({ children }) {
-  const { currentUser } = useSelector((state) => state.user)
-  const dispatch = useDispatch()
-  const [isValidating, setIsValidating] = useState(true)
-  const [isValid, setIsValid] = useState(false)
+  const { isAuthenticated, isLoading, isInitialized } = useAuth()
 
-  useEffect(() => {
-    const validateSession = async () => {
-      if (!currentUser) {
-        setIsValidating(false)
-        setIsValid(false)
-        return
-      }
-
-      const isLoggingOut = sessionStorage.getItem('isLoggingOut')
-      if (isLoggingOut === 'true') {
-        setIsValidating(false)
-        setIsValid(false)
-        return
-      }
-
-      try {
-        const response = await axios.get('/auth/session')
-        if (response.data?.success) {
-          setIsValid(true)
-        } else {
-          dispatch(signOut())
-          setIsValid(false)
-        }
-      } catch (error) {
-        dispatch(signOut())
-        setIsValid(false)
-      } finally {
-        setIsValidating(false)
-      }
-    }
-
-    validateSession()
-  }, [currentUser, dispatch])
-
-  if (isValidating) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8fa31e]"></div>
@@ -52,8 +29,8 @@ export default function PrivateRoute({ children }) {
     )
   }
 
-  if (!isValid || !currentUser) {
-    return <Navigate to="/sign-in" />
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace />
   }
   
   return children

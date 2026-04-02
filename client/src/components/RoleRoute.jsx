@@ -1,67 +1,47 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { isRoleAccessible, getDefaultRouteByRole } from '../utils/auth';
-import axios from '../services/axios';
-import { signOut } from '../redux/user/userSlice';
+/**
+ * =============================================================================
+ * ROLE ROUTE - Route Guard for Role-Based Access Control
+ * =============================================================================
+ * 
+ * This component extends PrivateRoute with role-based access control.
+ * 
+ * Usage:
+ * 
+ * <RoleRoute allowedRoles={['admin', 'superAdmin']}>
+ *   <AdminDashboard />
+ * </RoleRoute>
+ * 
+ * How it works:
+ * 1. Check if user is authenticated
+ * 2. Check if user's role is in the allowedRoles array
+ * 3. If authorized, render children
+ * 4. If not authorized, redirect to user's default dashboard
+ */
+
+import { Navigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { isRoleAccessible, getDefaultRouteByRole } from '../utils/auth'
 
 export default function RoleRoute({ children, allowedRoles }) {
-  const { currentUser, userRole } = useSelector((state) => state.user);
-  const location = useLocation();
-  const dispatch = useDispatch();
-  const [isValidating, setIsValidating] = useState(true);
-  const [isValid, setIsValid] = useState(false);
+  const { isAuthenticated, isLoading, isInitialized, role } = useAuth()
+  const location = useLocation()
 
-  useEffect(() => {
-    const validateSession = async () => {
-      if (!currentUser) {
-        setIsValidating(false);
-        setIsValid(false);
-        return;
-      }
-
-      const isLoggingOut = sessionStorage.getItem('isLoggingOut');
-      if (isLoggingOut === 'true') {
-        setIsValidating(false);
-        setIsValid(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get('/auth/session');
-        if (response.data?.success) {
-          setIsValid(true);
-        } else {
-          dispatch(signOut());
-          setIsValid(false);
-        }
-      } catch (error) {
-        dispatch(signOut());
-        setIsValid(false);
-      } finally {
-        setIsValidating(false);
-      }
-    };
-
-    validateSession();
-  }, [currentUser, dispatch]);
-
-  if (isValidating) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8fa31e]"></div>
       </div>
-    );
+    )
   }
 
-  if (!isValid || !currentUser) {
-    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" state={{ from: location }} replace />
   }
 
-  if (!isRoleAccessible(userRole, allowedRoles)) {
-    const redirectPath = getDefaultRouteByRole(userRole);
-    return <Navigate to={redirectPath} replace />;
+  if (!isRoleAccessible(role, allowedRoles)) {
+    const redirectPath = getDefaultRouteByRole(role)
+    return <Navigate to={redirectPath} replace />
   }
 
-  return children;
+  return children
 }
