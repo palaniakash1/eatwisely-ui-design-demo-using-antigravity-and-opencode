@@ -56,19 +56,14 @@ const redirectToSignIn = () => {
 };
 
 const getCsrfToken = () => {
-  let token = localStorage.getItem('csrfToken');
-  if (!token) {
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'csrfToken' || name === 'XSRF-TOKEN' || name === 'csrf_token') {
-        token = decodeURIComponent(value);
-        localStorage.setItem('csrfToken', token);
-        break;
-      }
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'csrf_token' || name === 'XSRF-TOKEN' || name === 'csrfToken') {
+      return decodeURIComponent(value);
     }
   }
-  return token;
+  return null;
 };
 
 export const refreshCsrfToken = async () => {
@@ -79,13 +74,11 @@ export const refreshCsrfToken = async () => {
     });
     const data = await res.json();
     if (data.csrfToken) {
-      localStorage.setItem('csrfToken', data.csrfToken);
-      console.log('CSRF Token refreshed:', data.csrfToken);
+      console.log('CSRF Token refreshed from session:', data.csrfToken);
       return data.csrfToken;
     }
     if (data.data?.csrfToken) {
-      localStorage.setItem('csrfToken', data.data.csrfToken);
-      console.log('CSRF Token refreshed from data:', data.data.csrfToken);
+      console.log('CSRF Token refreshed from session data:', data.data.csrfToken);
       return data.data.csrfToken;
     }
   } catch (error) {
@@ -97,7 +90,7 @@ export const refreshCsrfToken = async () => {
 const fetchWithAuth = async (url, options = {}, retryCount = 0) => {
   const csrfToken = getCsrfToken();
   const authToken = getAuthToken();
-  console.log('CSRF Token being sent:', csrfToken);
+  console.log('CSRF Token from cookie:', csrfToken);
   const headers = {
     'Content-Type': 'application/json',
     ...(csrfToken && { 'x-csrf-token': csrfToken }),
@@ -132,9 +125,6 @@ const fetchWithAuth = async (url, options = {}, retryCount = 0) => {
         });
         const retryData = await retryResponse.json();
         if (retryResponse.ok) {
-          if (retryData.csrfToken) {
-            localStorage.setItem('csrfToken', retryData.csrfToken);
-          }
           return retryData;
         }
         if (retryResponse.status === 401) {
@@ -149,13 +139,14 @@ const fetchWithAuth = async (url, options = {}, retryCount = 0) => {
       throw new Error(data.message || 'Session expired. Please sign in again.');
     }
 
-    if (data.message === 'Invalid CSRF token' || data.message?.includes('CSRF')) {
+    if (data.message === 'Invalid CSRF token' || data.message === 'Invalid or missing CSRF token' || data.message?.includes('CSRF')) {
       console.log('CSRF Error - trying to get fresh token...');
       const refreshed = await refreshAuthToken();
       
       if (refreshed) {
         const newCsrfToken = getCsrfToken();
         if (newCsrfToken) {
+          console.log('Retrying with new CSRF token:', newCsrfToken);
           headers['x-csrf-token'] = newCsrfToken;
           const retryResponse = await fetch(url, {
             ...options,
@@ -173,8 +164,7 @@ const fetchWithAuth = async (url, options = {}, retryCount = 0) => {
   }
 
   if (data.csrfToken) {
-    localStorage.setItem('csrfToken', data.csrfToken);
-    console.log('CSRF Token stored:', data.csrfToken);
+    console.log('CSRF Token from response:', data.csrfToken);
   }
 
   return data;
@@ -218,19 +208,19 @@ export const logoutUser = async () => {
 };
 
 export const updateUserInJson = async (userId, updates) => {
-  let csrfToken = getCsrfToken();
+  const csrfToken = getCsrfToken();
   if (!csrfToken) {
+    console.log('No CSRF token found, refreshing...');
     await refreshCsrfToken();
-    csrfToken = getCsrfToken();
   }
   
-  const data = await fetchWithAuth(`${API_URL}/users/${userId}`, {
-    method: 'PATCH',
+  const data = await fetchWithAuth(`${API_URL}/admin/users/${userId}`, {
+    method: 'PUT',
     body: JSON.stringify(updates),
   });
 
-  if (data.success && data.data) {
-    return data.data;
+  if (data.success && data.user) {
+    return data.user;
   }
 
   return data;
@@ -256,7 +246,7 @@ export const getUserById = async (userId) => {
 };
 
 export const createUser = async (userData) => {
-  const data = await fetchWithAuth(`${API_URL}/users`, {
+  const data = await fetchWithAuth(`${API_URL}/admin/users`, {
     method: 'POST',
     body: JSON.stringify(userData),
   });
