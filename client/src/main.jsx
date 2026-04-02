@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { store, persistor } from './redux/store'
 import { ToastProvider } from './components/Toast'
 import { AuthProvider } from './context/AuthContext'
+import { SystemModeProvider } from './context/SystemModeContext'
 import App from './App.jsx'
 import './index.css'
 
@@ -22,7 +23,9 @@ createRoot(document.getElementById('root')).render(
         <BrowserRouter>
           <ToastProvider>
             <AuthProvider>
-              <App />
+              <SystemModeProvider>
+                <App />
+              </SystemModeProvider>
             </AuthProvider>
           </ToastProvider>
         </BrowserRouter>
