@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { signOut } from '../../redux/user/userSlice'
-import { logoutUser } from '../../services/userApi'
+import { Outlet, Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { FaHome, FaList, FaStar, FaCog, FaSignOutAlt, FaBars, FaTimes, FaUser, FaTags } from 'react-icons/fa'
 
 const menuItems = [
@@ -18,9 +16,7 @@ const bottomMenuItems = [
 ]
 
 export default function ManagerLayout() {
-  const { currentUser, userRole } = useSelector((state) => state.user)
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   
@@ -39,13 +35,10 @@ export default function ManagerLayout() {
 
   const handleSignOut = async () => {
     try {
-      await logoutUser()
+      await logout()
     } catch (error) {
       console.error('Logout error:', error)
     }
-    dispatch(signOut())
-    sessionStorage.removeItem('isLoggingOut')
-    navigate('/sign-in')
   }
 
   const closeSidebar = () => setSidebarOpen(false)
@@ -121,23 +114,23 @@ export default function ManagerLayout() {
 
           <div className="pt-3 border-t border-gray-200">
             <div className="flex items-center gap-3 px-2 py-2">
-              {currentUser?.profilePicture ? (
+              {user?.profilePicture ? (
                 <img
-                  src={currentUser.profilePicture}
-                  alt={currentUser.userName}
+                  src={user.profilePicture}
+                  alt={user.userName}
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-[#8fa31e] flex items-center justify-center text-white font-semibold">
-                  {currentUser?.userName?.charAt(0).toUpperCase()}
+                  {user?.userName?.charAt(0).toUpperCase()}
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
-                  {currentUser?.userName}
+                  {user?.userName}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
-                  {currentUser?.email}
+                  {user?.email}
                 </p>
               </div>
             </div>
