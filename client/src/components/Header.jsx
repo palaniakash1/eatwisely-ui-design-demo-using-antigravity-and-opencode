@@ -1,17 +1,13 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import { signOut } from '../redux/user/userSlice'
-import { logoutUser } from '../services/userApi'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { getDefaultRouteByRole } from '../utils/auth'
 import { Navbar, TextInput, Button, Dropdown, Avatar } from 'flowbite-react'
 import { HiSearch, HiLocationMarker, HiUser, HiCog, HiLogout, HiViewGrid } from 'react-icons/hi'
 
 export default function Header() {
   const location = useLocation()
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { currentUser, userRole } = useSelector((state) => state.user)
+  const { user, role, logout, isAuthenticated } = useAuth()
   
   const [restaurantSearch, setRestaurantSearch] = useState('')
   const [locationSearch, setLocationSearch] = useState('')
@@ -21,10 +17,7 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
-      await logoutUser()
-      dispatch(signOut())
-      sessionStorage.removeItem('isLoggingOut')
-      navigate('/')
+      await logout()
     } catch (error) {
       console.log(error)
     }
@@ -88,13 +81,13 @@ export default function Header() {
               Food Menu
             </Link>
 
-            {currentUser ? (
+            {isAuthenticated && user ? (
               <Dropdown
                 arrowIcon={false}
                 inline
                 label={
                   <Avatar
-                    img={currentUser.profilePicture || 'https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80'}
+                    img={user.profilePicture || 'https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740&q=80'}
                     rounded
                     size="sm"
                     className="cursor-pointer border-2 border-[#8fa31e]"
@@ -102,14 +95,14 @@ export default function Header() {
                 }
               >
                 <Dropdown.Header>
-                  <span className="block text-sm font-semibold">{currentUser.userName}</span>
-                  <span className="block text-sm text-gray-500 truncate">{currentUser.email}</span>
+                  <span className="block text-sm font-semibold">{user.userName}</span>
+                  <span className="block text-sm text-gray-500 truncate">{user.email}</span>
                 </Dropdown.Header>
                 <Dropdown.Item icon={HiUser}>
                   <Link to="/profile" className="w-full">Profile</Link>
                 </Dropdown.Item>
                 <Dropdown.Item icon={HiViewGrid}>
-                  <Link to={getDefaultRouteByRole(userRole)} className="w-full">Dashboard</Link>
+                  <Link to={getDefaultRouteByRole(role)} className="w-full">Dashboard</Link>
                 </Dropdown.Item>
                 <Dropdown.Item icon={HiCog}>
                   <Link to="/settings" className="w-full">Settings</Link>
