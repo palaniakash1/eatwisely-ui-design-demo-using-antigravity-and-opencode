@@ -30,7 +30,8 @@ const messages = {
   },
   objectId: 'Invalid ID format. Please provide a valid 24-character hex string',
   pattern: {
-    objectId: 'Invalid ID format. Please provide a valid 24-character hex string (e.g., "507f1f77bcf86cd799439011")'
+    objectId:
+      'Invalid ID format. Please provide a valid 24-character hex string (e.g., "507f1f77bcf86cd799439011")'
   }
 };
 
@@ -155,12 +156,28 @@ export const authValidators = {
 };
 
 export const adminValidators = {
+  idParam: userIdParam,
   createPrivilegedUser: Joi.object({
     userName: Joi.string().trim().min(3).max(30).lowercase().required(),
     email: Joi.string().trim().email().required(),
     password: Joi.string().pattern(PASSWORD_REGEX).required(),
-    role: Joi.string().valid('admin', 'storeManager').required()
-  })
+    role: Joi.string().valid('admin', 'storeManager').required(),
+    permissions: Joi.object()
+      .pattern(Joi.string(), Joi.array().items(Joi.string()).unique())
+      .default(null),
+    isActive: Joi.boolean().default(true)
+  }),
+  updatePrivilegedUser: Joi.object({
+    userName: Joi.string().trim().min(3).max(30).lowercase(),
+    email: Joi.string().trim().email(),
+    password: Joi.string().pattern(PASSWORD_REGEX),
+    role: Joi.string().valid('admin', 'storeManager'),
+    permissions: Joi.object()
+      .pattern(Joi.string(), Joi.array().items(Joi.string()).unique())
+      .allow(null),
+    isActive: Joi.boolean(),
+    profilePicture: Joi.string().uri().allow('')
+  }).min(1)
 };
 
 export const userValidators = {
@@ -356,29 +373,32 @@ export const menuValidators = {
     isAvailable: Joi.boolean()
   }).unknown(false),
   addItemsBody: Joi.object({
-    items: Joi.array().items(
-      Joi.object({
-        name: Joi.string().trim().min(1).required(),
-        description: Joi.string().allow(''),
-        image: Joi.string().uri().allow(''),
-        price: Joi.number().min(0).required(),
-        dietary: Joi.object({
-          vegetarian: Joi.boolean(),
-          vegan: Joi.boolean()
-        }),
-        ingredients: Joi.array().items(Joi.object().unknown(true)),
-        nutrition: Joi.object().unknown(true),
-        upsells: Joi.array().items(
-          Joi.object({
-            label: Joi.string().trim().required(),
-            price: Joi.number().min(0).required()
-          })
-        ),
-        isMeal: Joi.boolean(),
-        order: Joi.number().integer().min(0),
-        isAvailable: Joi.boolean()
-      })
-    ).min(1).required()
+    items: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().trim().min(1).required(),
+          description: Joi.string().allow(''),
+          image: Joi.string().uri().allow(''),
+          price: Joi.number().min(0).required(),
+          dietary: Joi.object({
+            vegetarian: Joi.boolean(),
+            vegan: Joi.boolean()
+          }),
+          ingredients: Joi.array().items(Joi.object().unknown(true)),
+          nutrition: Joi.object().unknown(true),
+          upsells: Joi.array().items(
+            Joi.object({
+              label: Joi.string().trim().required(),
+              price: Joi.number().min(0).required()
+            })
+          ),
+          isMeal: Joi.boolean(),
+          order: Joi.number().integer().min(0),
+          isAvailable: Joi.boolean()
+        })
+      )
+      .min(1)
+      .required()
   }),
   updateItemBody: Joi.object({
     name: Joi.string().trim().min(1),

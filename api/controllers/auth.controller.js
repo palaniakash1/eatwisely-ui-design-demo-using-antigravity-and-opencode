@@ -509,10 +509,7 @@ export const signoutAllSessions = async (req, res, next) => {
       refreshToken: getRefreshTokenFromRequest(req),
       reason: 'signout_all'
     });
-    await incrementSecurityEvent(
-      'sessions_revoked_all',
-      result.revokedCount
-    );
+    await incrementSecurityEvent('sessions_revoked_all', result.revokedCount);
 
     await logAudit({
       actorId: req.user.id,
@@ -636,7 +633,7 @@ export const getSession = async (req, res, next) => {
   try {
     const user = await findUserById(
       req.user.id,
-      '_id userName email role restaurantId profilePicture isActive'
+      '_id userName email role restaurantId profilePicture isActive customPermissions'
     );
     if (!user) {
       return next(errorHandler(404, 'User not found'));

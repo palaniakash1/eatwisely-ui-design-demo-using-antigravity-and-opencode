@@ -47,7 +47,9 @@ export const updateUserProfile = async ({ actor, targetUserId, body, req }) =>
           'userName',
           'password',
           'profilePicture',
-          'email'
+          'email',
+          'role',
+          'isActive'
         ];
         const updates = {};
 
@@ -71,16 +73,10 @@ export const updateUserProfile = async ({ actor, targetUserId, body, req }) =>
               'userName must be between 3 and 30 characters'
             );
           }
-          if (updates.userName.includes(' ')) {
-            throw errorHandler(400, 'userName should not contain spaces');
-          }
-          if (updates.userName !== updates.userName.toLowerCase()) {
-            throw errorHandler(400, ' UserName must be lowercase');
-          }
-          if (!USERNAME_REGEX.test(updates.userName)) {
+          if (!/^[a-zA-Z0-9\s]+$/.test(updates.userName)) {
             throw errorHandler(
               400,
-              'UserName can only contain lowercase  letters and numbers'
+              'UserName can only contain letters, numbers, and spaces'
             );
           }
         }
@@ -114,7 +110,7 @@ export const updateUserProfile = async ({ actor, targetUserId, body, req }) =>
         }
 
         const diff = diffObject(oldUser, updatedUser, allowedFields);
-        if (Object.keys(diff).length) {
+        if (diff && Object.keys(diff).length) {
           await logAudit({
             actorId: actor.id,
             actorRole: actor.role,
@@ -330,9 +326,6 @@ export const createStoreManagerUser = async ({ actor, body, req }) =>
   traceAuthOperation('createStoreManagerUser', actor.id, {}, async () => {
     const { userName, email, password } = body;
 
-    if (!userName || userName.trim() === '') {
-      throw errorHandler(400, 'Please provide a valid username');
-    }
     if (userName.length < 3) {
       throw errorHandler(400, 'Username must be at least 3 characters long');
     }
