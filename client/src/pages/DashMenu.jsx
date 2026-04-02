@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Table, Badge, Button, TextInput, Label, Modal, Select, Textarea, Checkbox } from 'flowbite-react'
 import { FaPencil, FaPlus, FaTrash } from "react-icons/fa6";
+import { HiUpload } from "react-icons/hi";
 import {
   DashboardHeader,
   DashboardContent,
 } from "../components/DashboardLayout";
 import { useToast } from "../components/Toast";
+import ImageUploadCropper from "../components/ImageUploadCropper";
 import restaurantsData from "../data/restaurants.json";
 
 const ALLERGEN_OPTIONS = [
@@ -117,6 +119,15 @@ export default function DashMenu() {
   const [selectedItem, setSelectedItem] = useState(null)
   const [statusFilter, setStatusFilter] = useState([])
   const [restaurantFilter, setRestaurantFilter] = useState([])
+  const [menuImage, setMenuImage] = useState(null)
+  const [menuImagePreview, setMenuImagePreview] = useState(null)
+
+  const handleCroppedImage = useCallback((croppedFile) => {
+    setMenuImage(croppedFile)
+    const preview = URL.createObjectURL(croppedFile)
+    setMenuImagePreview(preview)
+    setFormData((prev) => ({ ...prev, image: preview }))
+  }, [])
 
   const [formData, setFormData] = useState({
     name: '',
@@ -214,6 +225,11 @@ export default function DashMenu() {
     },
     upsells: []
   })
+
+  const resetImageState = () => {
+    setMenuImage(null)
+    setMenuImagePreview(null)
+  }
 
   const addIngredient = () => {
     setFormData({
@@ -346,8 +362,22 @@ export default function DashMenu() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="image" value="Image URL" />
-          <TextInput id="image" value={formData.image} onChange={(e) => setFormData({...formData, image: e.target.value})} placeholder="https://..." />
+          <Label value="Image" />
+          <ImageUploadCropper
+            onCropComplete={handleCroppedImage}
+            maxFileSizeMB={2}
+          >
+            <div className="mt-2 w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#8fa31e] hover:bg-gray-50 transition-all overflow-hidden">
+              {menuImagePreview || formData.image ? (
+                <img src={menuImagePreview || formData.image} alt="Menu preview" className="w-full h-full object-cover" />
+              ) : (
+                <>
+                  <HiUpload className="w-6 h-6 text-gray-400 mb-1" />
+                  <span className="text-xs text-gray-500">Click to upload</span>
+                </>
+              )}
+            </div>
+          </ImageUploadCropper>
         </div>
         <div>
           <Label htmlFor="restaurant" value="Restaurant *" />
@@ -625,25 +655,25 @@ export default function DashMenu() {
           </div>
         </div>
 
-        <Modal show={showAddModal} onClose={() => { setShowAddModal(false); setFormData(resetFormData()) }} size="2xl">
+        <Modal show={showAddModal} onClose={() => { setShowAddModal(false); setFormData(resetFormData()); resetImageState(); }} size="2xl">
           <Modal.Header>Add Menu Item</Modal.Header>
           <Modal.Body>
             {renderMenuItemForm(false)}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={handleAddMenuItem}>Add Item</Button>
-            <Button color="gray" onClick={() => { setShowAddModal(false); setFormData(resetFormData()) }}>Cancel</Button>
+            <Button onClick={handleAddMenuItem} className="bg-[#8fa31e]">Add Item</Button>
+            <Button color="gray" onClick={() => { setShowAddModal(false); setFormData(resetFormData()); resetImageState(); }}>Cancel</Button>
           </Modal.Footer>
         </Modal>
 
-        <Modal show={showEditModal} onClose={() => { setShowEditModal(false); setSelectedItem(null); setFormData(resetFormData()) }} size="2xl">
+        <Modal show={showEditModal} onClose={() => { setShowEditModal(false); setSelectedItem(null); setFormData(resetFormData()); resetImageState(); }} size="2xl">
           <Modal.Header>Edit Menu Item</Modal.Header>
           <Modal.Body>
             {renderMenuItemForm(true)}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={handleEditMenuItem}>Save Changes</Button>
-            <Button color="gray" onClick={() => { setShowEditModal(false); setSelectedItem(null); setFormData(resetFormData()) }}>Cancel</Button>
+            <Button onClick={handleEditMenuItem} className="bg-[#8fa31e]">Save Changes</Button>
+            <Button color="gray" onClick={() => { setShowEditModal(false); setSelectedItem(null); setFormData(resetFormData()); resetImageState(); }}>Cancel</Button>
           </Modal.Footer>
         </Modal>
       </DashboardContent>

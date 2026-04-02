@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Card, Table, Button, TextInput, Textarea, Label, FileInput, Badge } from 'flowbite-react'
-import { HiPlus, HiPencil, HiTrash, HiSearch, HiLocationMarker } from 'react-icons/hi'
+import { useState, useCallback } from 'react'
+import { Card, Table, Button, TextInput, Textarea, Label, Badge } from 'flowbite-react'
+import { HiPlus, HiPencil, HiTrash, HiSearch, HiLocationMarker, HiUpload } from 'react-icons/hi'
+import ImageUploadCropper from './ImageUploadCropper'
 
 const formatAddress = (address) => {
   if (!address) return ''
@@ -18,6 +19,13 @@ export default function DashRestaurants() {
   const [restaurants, setRestaurants] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [coverImage, setCoverImage] = useState(null)
+  const [coverImagePreview, setCoverImagePreview] = useState(null)
+
+  const handleCroppedImage = useCallback((croppedFile) => {
+    setCoverImage(croppedFile)
+    setCoverImagePreview(URL.createObjectURL(croppedFile))
+  }, [])
 
   const filteredRestaurants = restaurants.filter(restaurant =>
     restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -71,7 +79,21 @@ export default function DashRestaurants() {
             </div>
             <div>
               <Label htmlFor="image" value="Cover Image" />
-              <FileInput id="image" accept="image/*" />
+              <ImageUploadCropper
+                onCropComplete={handleCroppedImage}
+                maxFileSizeMB={2}
+              >
+                <div className="mt-2 w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#8fa31e] hover:bg-gray-50 transition-all">
+                  {coverImagePreview ? (
+                    <img src={coverImagePreview} alt="Cover preview" className="w-full h-full object-cover rounded-lg" />
+                  ) : (
+                    <>
+                      <HiUpload className="w-8 h-8 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-500">Click to upload cover image</span>
+                    </>
+                  )}
+                </div>
+              </ImageUploadCropper>
             </div>
             <div className="flex gap-2">
               <Button type="submit" className="bg-[#8fa31e]">Save</Button>
