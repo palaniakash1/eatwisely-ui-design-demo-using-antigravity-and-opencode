@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Table, Badge, Button, TextInput } from "flowbite-react";
 import { FaSearch, FaStar, FaTrash, FaReply } from "react-icons/fa";
 
@@ -32,21 +32,22 @@ const defaultAdminReviews = [
   },
 ];
 
+const getInitialReviews = () => {
+  try {
+    const stored = localStorage.getItem("admin_reviews");
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to load reviews:', e);
+  }
+  localStorage.setItem("admin_reviews", JSON.stringify(defaultAdminReviews));
+  return defaultAdminReviews;
+};
+
 export default function AdminReviews() {
-  const [reviews, setReviews] = useState([]);
+  const [reviews] = useState(getInitialReviews);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-
-  useEffect(() => {
-    const storedReviews = localStorage.getItem("admin_reviews");
-    if (storedReviews) {
-      setReviews(JSON.parse(storedReviews));
-    } else {
-      setReviews(defaultAdminReviews);
-      localStorage.setItem("admin_reviews", JSON.stringify(defaultAdminReviews));
-    }
-  }, []);
 
   const filteredReviews = reviews.filter((review) => {
     const matchesSearch =

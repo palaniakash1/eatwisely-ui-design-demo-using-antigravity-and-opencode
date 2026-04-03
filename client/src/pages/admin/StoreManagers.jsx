@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Table, Badge, Button, TextInput } from 'flowbite-react';
 import { FaSearch, FaPlus, FaTrash } from 'react-icons/fa';
@@ -28,28 +28,24 @@ const defaultStoreManagers = [
   }
 ];
 
+const getInitialManagers = (userId) => {
+  try {
+    const stored = localStorage.getItem(`admin_store_managers_${userId}`);
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to load managers:', e);
+  }
+  localStorage.setItem(`admin_store_managers_${userId}`, JSON.stringify(defaultStoreManagers));
+  return defaultStoreManagers;
+};
+
 export default function AdminStoreManagers() {
   const { currentUser } = useSelector((state) => state.user);
-  const [managers, setManagers] = useState([]);
+  const [managers] = useState(() => getInitialManagers(currentUser?._id));
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [showAddModal, setShowAddModal] = useState(false);
-
-  useEffect(() => {
-    const storedManagers = localStorage.getItem(
-      `admin_store_managers_${currentUser?._id}`
-    );
-    if (storedManagers) {
-      setManagers(JSON.parse(storedManagers));
-    } else {
-      setManagers(defaultStoreManagers);
-      localStorage.setItem(
-        `admin_store_managers_${currentUser?._id}`,
-        JSON.stringify(defaultStoreManagers)
-      );
-    }
-  }, [currentUser]);
 
   const filteredManagers = managers.filter((manager) => {
     const matchesSearch =

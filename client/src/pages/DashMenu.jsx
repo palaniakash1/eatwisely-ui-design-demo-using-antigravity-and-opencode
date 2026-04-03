@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { Table, Badge, Button, TextInput, Label, Modal, Select, Textarea, Checkbox } from 'flowbite-react'
 import { FaPencil, FaPlus, FaTrash } from "react-icons/fa6";
@@ -6,7 +6,7 @@ import { HiUpload } from "react-icons/hi";
 import {
   DashboardHeader,
   DashboardContent,
-} from "../components/DashboardLayout";
+} from "../components/DashboardLayout.jsx";
 import { useToast } from "../components/Toast";
 import ImageUploadCropper from "../components/ImageUploadCropper";
 import restaurantsData from "../data/restaurants.json";
@@ -108,9 +108,41 @@ const defaultMenuItems = [
 export default function DashMenu() {
   const { currentUser } = useSelector((state) => state.user)
   const toast = useToast()
-  const [menuItems, setMenuItems] = useState([])
-  const [restaurants, setRestaurants] = useState([])
-  const [categories, setCategories] = useState([])
+  
+  const getInitialMenuItems = () => {
+    try {
+      const stored = localStorage.getItem('menuItems')
+      if (stored) return JSON.parse(stored)
+    } catch (e) {
+      console.error('Failed to load menu items:', e)
+    }
+    localStorage.setItem('menuItems', JSON.stringify(defaultMenuItems))
+    return defaultMenuItems
+  }
+  
+  const getInitialRestaurants = () => {
+    try {
+      const stored = localStorage.getItem('restaurants')
+      if (stored) return JSON.parse(stored)
+    } catch (e) {
+      console.error('Failed to load restaurants:', e)
+    }
+    return restaurantsData
+  }
+  
+  const getInitialCategories = () => {
+    try {
+      const stored = localStorage.getItem('categories')
+      if (stored) return JSON.parse(stored)
+    } catch (e) {
+      console.error('Failed to load categories:', e)
+    }
+    return []
+  }
+  
+  const [menuItems] = useState(getInitialMenuItems)
+  const [restaurants] = useState(getInitialRestaurants)
+  const [categories] = useState(getInitialCategories)
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -121,14 +153,6 @@ export default function DashMenu() {
   const [restaurantFilter, setRestaurantFilter] = useState([])
   const [menuImage, setMenuImage] = useState(null)
   const [menuImagePreview, setMenuImagePreview] = useState(null)
-
-  const handleCroppedImage = useCallback((croppedFile) => {
-    setMenuImage(croppedFile)
-    const preview = URL.createObjectURL(croppedFile)
-    setMenuImagePreview(preview)
-    setFormData((prev) => ({ ...prev, image: preview }))
-  }, [])
-
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -153,23 +177,11 @@ export default function DashMenu() {
     upsells: []
   })
 
-  useEffect(() => {
-    const storedMenu = localStorage.getItem('menuItems')
-    if (storedMenu) {
-      setMenuItems(JSON.parse(storedMenu))
-    } else {
-      setMenuItems(defaultMenuItems)
-      localStorage.setItem('menuItems', JSON.stringify(defaultMenuItems))
-    }
-    
-    const storedRestaurants = localStorage.getItem('restaurants')
-    const restData = storedRestaurants ? JSON.parse(storedRestaurants) : restaurantsData
-    setRestaurants(restData)
-    
-    const storedCategories = localStorage.getItem('categories')
-    if (storedCategories) {
-      setCategories(JSON.parse(storedCategories))
-    }
+  const handleCroppedImage = useCallback((croppedFile) => {
+    setMenuImage(croppedFile)
+    const preview = URL.createObjectURL(croppedFile)
+    setMenuImagePreview(preview)
+    setFormData((prev) => ({ ...prev, image: preview }))
   }, [])
 
   const statusOptions = [

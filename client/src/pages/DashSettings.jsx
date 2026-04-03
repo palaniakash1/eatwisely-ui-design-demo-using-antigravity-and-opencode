@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Alert } from 'flowbite-react';
 import { useToast } from '../components/Toast';
 import { useSystemMode } from '../context/SystemModeContext';
@@ -28,6 +28,30 @@ function ToggleSwitch({ checked, onChange, id }) {
   );
 }
 
+const defaultSettings = {
+  siteName: 'EatWisely',
+  siteEmail: 'support@eatwisely.com',
+  contactPhone: '+44 20 7946 0000',
+  address: '123 Main Street, London, UK',
+  allowRegistration: true,
+  requireEmailVerification: false,
+  defaultUserRole: 'user',
+  maxRestaurantsPerUser: 5
+};
+
+const getInitialSettings = () => {
+  try {
+    const stored = localStorage.getItem('siteSettings');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return { ...defaultSettings, ...parsed };
+    }
+  } catch (e) {
+    console.error('Failed to load settings:', e);
+  }
+  return defaultSettings;
+};
+
 export default function DashSettings() {
   const toast = useToast();
   const {
@@ -37,27 +61,9 @@ export default function DashSettings() {
     setUnderDevelopment
   } = useSystemMode();
 
-  const [settings, setSettings] = useState({
-    siteName: 'EatWisely',
-    siteEmail: 'support@eatwisely.com',
-    contactPhone: '+44 20 7946 0000',
-    address: '123 Main Street, London, UK',
-    allowRegistration: true,
-    requireEmailVerification: false,
-    defaultUserRole: 'user',
-    maxRestaurantsPerUser: 5
-  });
-
+  const [settings, setSettings] = useState(getInitialSettings);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(null);
-
-  useEffect(() => {
-    const storedSettings = localStorage.getItem('siteSettings');
-    if (storedSettings) {
-      const parsed = JSON.parse(storedSettings);
-      setSettings((prev) => ({ ...prev, ...parsed }));
-    }
-  }, []);
 
   const handleSaveSettings = async () => {
     setLoading(true);

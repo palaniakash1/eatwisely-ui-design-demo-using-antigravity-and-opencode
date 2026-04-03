@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Table, Badge, TextInput } from "flowbite-react";
 import { FaSearch, FaEye } from "react-icons/fa";
 
@@ -45,21 +45,22 @@ const defaultCategories = [
   },
 ];
 
+const getInitialCategories = () => {
+  try {
+    const stored = localStorage.getItem("categories");
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to load categories:', e);
+  }
+  localStorage.setItem("categories", JSON.stringify(defaultCategories));
+  return defaultCategories;
+};
+
 export default function ManagerCategories() {
-  const [categories, setCategories] = useState([]);
+  const [categories] = useState(getInitialCategories);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-
-  useEffect(() => {
-    const storedCategories = localStorage.getItem("categories");
-    if (storedCategories) {
-      setCategories(JSON.parse(storedCategories));
-    } else {
-      setCategories(defaultCategories);
-      localStorage.setItem("categories", JSON.stringify(defaultCategories));
-    }
-  }, []);
 
   const filteredCategories = categories.filter((category) => {
     const matchesSearch =

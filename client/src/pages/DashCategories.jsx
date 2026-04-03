@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Badge,
   Button,
@@ -32,8 +32,19 @@ function SwitchField({ checked, onChange, id }) {
   );
 }
 
+const getInitialCategories = () => {
+  try {
+    const stored = localStorage.getItem("categories");
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to load categories:', e);
+  }
+  localStorage.setItem("categories", JSON.stringify(defaultCategories));
+  return defaultCategories;
+};
+
 export default function DashCategories() {
-  const [categories, setCategories] = useState([]);
+  const [categories] = useState(getInitialCategories);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -48,16 +59,6 @@ export default function DashCategories() {
     description: "",
     isActive: true,
   });
-
-  useEffect(() => {
-    const storedCategories = localStorage.getItem("categories");
-    if (storedCategories) {
-      setCategories(JSON.parse(storedCategories));
-    } else {
-      setCategories(defaultCategories);
-      localStorage.setItem("categories", JSON.stringify(defaultCategories));
-    }
-  }, []);
 
   const filteredCategories = categories.filter((category) => {
     const matchesSearch =

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Table, Badge, Button, TextInput } from "flowbite-react";
 import { FaSearch, FaStar, FaTrash, FaEye } from "react-icons/fa";
 
@@ -50,22 +50,23 @@ const defaultReviews = [
   },
 ];
 
+const getInitialReviews = () => {
+  try {
+    const stored = localStorage.getItem("reviews");
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to load reviews:', e);
+  }
+  localStorage.setItem("reviews", JSON.stringify(defaultReviews));
+  return defaultReviews;
+};
+
 export default function DashReviews() {
-  const [reviews, setReviews] = useState([]);
+  const [reviews] = useState(getInitialReviews);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [statusFilter, setStatusFilter] = useState([]);
-
-  useEffect(() => {
-    const storedReviews = localStorage.getItem("reviews");
-    if (storedReviews) {
-      setReviews(JSON.parse(storedReviews));
-    } else {
-      setReviews(defaultReviews);
-      localStorage.setItem("reviews", JSON.stringify(defaultReviews));
-    }
-  }, []);
 
   const statusOptions = [
     { value: "approved", label: "Approved", selected: statusFilter.includes("approved") },

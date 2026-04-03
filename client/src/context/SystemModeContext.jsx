@@ -23,11 +23,7 @@ export function SystemModeProvider({ children }) {
     return defaultMode;
   });
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(false);
-  }, []);
+  const [isLoading] = useState(false);
 
   const saveToStorage = useCallback((newMode) => {
     try {

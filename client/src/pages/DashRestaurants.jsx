@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Table,
@@ -16,14 +16,25 @@ import {
   DashboardHeader,
   DashboardContent,
   DashboardLayout,
-} from "../components/DashboardLayout";
+} from "../components/DashboardLayout.jsx";
 
 import { Link } from "react-router-dom";
 import restaurantsData from "../data/restaurants.json";
 
+const getInitialRestaurants = () => {
+  try {
+    const stored = localStorage.getItem("restaurants");
+    if (stored) return JSON.parse(stored);
+  } catch (e) {
+    console.error('Failed to load restaurants:', e);
+  }
+  localStorage.setItem("restaurants", JSON.stringify(restaurantsData));
+  return restaurantsData;
+};
+
 export default function DashRestaurants() {
   const { currentUser } = useSelector((state) => state.user);
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurants] = useState(getInitialRestaurants);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -57,16 +68,6 @@ export default function DashRestaurants() {
     isFeatured: false,
     isTrending: false,
   });
-
-  useEffect(() => {
-    const storedRestaurants = localStorage.getItem("restaurants");
-    if (storedRestaurants) {
-      setRestaurants(JSON.parse(storedRestaurants));
-    } else {
-      setRestaurants(restaurantsData);
-      localStorage.setItem("restaurants", JSON.stringify(restaurantsData));
-    }
-  }, []);
 
   const allCategories = [
     ...new Set(restaurants.flatMap((r) => r.categories || [])),
