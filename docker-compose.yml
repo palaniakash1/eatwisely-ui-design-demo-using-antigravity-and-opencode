@@ -1,0 +1,11 @@
+name: mern-restaurant-app-antigravity-opencode
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/DockerFile
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - 3001:3001
