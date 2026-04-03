@@ -3,6 +3,7 @@ export const PERMISSIONS = {
     auth: ['signout', 'session', 'changePassword', 'manageUserSessions'],
     admin: ['createPrivilegedUser'],
     audit: ['read'],
+    dashboard: ['read'],
     user: [
       'test',
       'listAll',
@@ -69,6 +70,7 @@ export const PERMISSIONS = {
   admin: {
     auth: ['signout', 'session', 'changePassword'],
     audit: ['read'],
+    dashboard: ['read'],
     user: [
       'listStoreManagers',
       'createStoreManager',
@@ -118,6 +120,7 @@ export const PERMISSIONS = {
   },
   storeManager: {
     auth: ['signout', 'session', 'changePassword'],
+    dashboard: ['read'],
     menu: [
       'readDeleted',
       'addItem',
